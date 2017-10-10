@@ -10,6 +10,7 @@ import base64
 #    import cStringIO as io
 #except ImportError:
 import io
+import picamera
 
 import tornado.web
 import tornado.websocket
@@ -18,129 +19,90 @@ from time import sleep
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
+camera = None
+
 from Car import Car4W
 from Tyre import Tyre
 
-frontRight = Tyre(24, 25, 19, 1)
-frontLeft = Tyre(11, 9, 13, 1)
-backLeft = Tyre(15, 14, 12, 1)
-backRight = Tyre(23, 17, 18, 1)
+frontRight = Tyre(24, 25, 19, 50)
+frontLeft = Tyre(11, 9, 13, 50)
+backLeft = Tyre(15, 14, 12, 50)
+backRight = Tyre(23, 17, 18, 50)
 
 car = Car4W(frontRight, frontLeft, backRight, backLeft)
 car.stop()
+#print ("Stop")
+#car.test()
+#print ("DoneTest")
 
-class ActionAndSensor(tornado.websocket.WebSocketHandler):
+class Action(tornado.websocket.WebSocketHandler):
 
     def check_origin(self, origin):
         return True
     
     def on_message(self, message):
         try:
-            pass
-            self.write_message("Yahoo");
             methodName = message
-            if isinstance(methodName, car):
-                method = getattr(car, methodName)
-                method()
-                print ("INFO: Calling " + methodName)
-            else:
-                print ("ERR: Invalid method " + methodName)
+            print ("INFO: Calling " + methodName)
+            method = getattr(car, methodName)
+            method()
+            #print ("ERR: Invalid method " + methodName)
         except tornado.websocket.WebSocketClosedError:
-            self.camera_loop.stop()
+            pass
 
 class CameraOne(tornado.websocket.WebSocketHandler):
-
+    t = None
     def check_origin(self, origin):
         return True
     
     def on_message(self, message):
         global camera
 
-        if message == "close_camera":
-            camera.stop();        
-            print "close_camera"    
-        elif message == "read_camera":
-            #startCamera();
+        if message == "read_camera":
+            startCamera();
             sleep(0.2);
-
-            t = threading.Thread(target=self.loop)
-            t.start()
-            #self.camera_loop = PeriodicCallback(self.loop, 10)
-            #self.camera_loop.start()
+            if self.t == None:
+                self.t = threading.Thread(target=self.loop)
+                self.t.start()
         else:
             print("Unsupported function: " + message)
 
     def loop(self):
         global camera
         stream = io.BytesIO()
-
+        import sys
         for frame in camera.capture_continuous(stream, format="jpeg", use_video_port=True):
             stream.seek(0)
 
             try:
-                #TODO: remove base64 from here
-                self.write_message(base64.b64encode(stream.getvalue()))
-                #self.write_message(stream.getvalue(), True)
+                self.write_message(stream.getvalue(), True)
             except tornado.websocket.WebSocketClosedError:
-                self.camera_loop.stop()
-
-            #593 - 30 sec else 524
-            #img = np.asarray(Image.open(stream))
-            #cv2.imshow("Frame", img)
-
+                camera.close()
+                camera = None
+                break
+            
             stream.truncate(0)
 
-        #if args.use_usb:
-        #    _, frame = camera.read()
-        #    img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-        #    img.save(sio, "JPEG")
-        #else:
-        #camera.capture(sio, "jpeg", use_video_port=True)
-        #try:
-            #.tobytes("raw", "RGBA")
-            #self.write_message(sio.getvalue())
-        #    self.write_message(sio.getvalue(), True)
-        #except tornado.websocket.WebSocketClosedError:
-        #    self.camera_loop.stop()
-
-        #sio.
-
-
-
-
-
-parser = argparse.ArgumentParser(description="Starts a webserver that "
-                                 "connects to a webcam.")
-parser.add_argument("--port", type=int, default=8000, help="The "
-                    "port on which to serve the website.")
-parser.add_argument("--use-usb", action="store_true", help="Use a USB "
-                    "webcam instead of the standard Pi camera.")
-args = parser.parse_args()
-
-if args.use_usb:
-    import cv2
-    from PIL import Image
-else:
-    import picamera
     
-def startCamera(resolution = 'low'):
+def startCamera():
     global camera
+    if camera:
+        camera.stop()
     camera = picamera.PiCamera()
     camera.start_preview()
     camera.rotation = 180
     camera.resolution= (320, 240)
-    camera.framerate = 20
+    camera.framerate = 15
 
-startCamera()
 handlers = set()
 
 handlers = [
-                (r"/CameraOne", CameraOne),
-                (r"/ActionAndSensor", ActionAndSensor)
-            ]
+    (r"/CameraOne", CameraOne),
+    (r"/Action", Action)
+]
 
 application = tornado.web.Application(handlers)
-application.listen(args.port)
+application.listen(8000)
 
 #webbrowser.open("http://localhost:%d/" % args.port, new=2)
 
