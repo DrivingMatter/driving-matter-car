@@ -23,6 +23,7 @@ camera = None
 
 from Car import Car4W
 from Tyre import Tyre
+from RegisterCar import RegisterCar
 
 frontRight = Tyre(24, 25, 19, 50)
 frontLeft = Tyre(11, 9, 13, 50)
@@ -34,6 +35,18 @@ car.stop()
 #print ("Stop")
 #car.test()
 #print ("DoneTest")
+
+class Server():
+    def __init__():
+        rc = RegisterCar()
+        rc.register_car("Mater")
+
+    # Destructor
+    def __enter__(self)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback)
+        rc.unregister_car()
 
 class Action(tornado.websocket.WebSocketHandler):
 
@@ -82,8 +95,7 @@ class CameraOne(tornado.websocket.WebSocketHandler):
                 break
             
             stream.truncate(0)
-
-    
+   
 def startCamera():
     global camera
     if camera:
