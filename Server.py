@@ -24,13 +24,20 @@ camera = None
 from Car import Car4W
 from Tyre import Tyre
 from RegisterCar import RegisterCar
+from UDSensor import CollisionSensor
+
+ultrasonic_right = CollisionSensor(echo=16, trigger=26)
+ultrasonic_center = CollisionSensor(echo=21, trigger=20)
+ultrasonic_left = CollisionSensor(echo=6, trigger=5)
+
+sensors = [ultrasonic_right, ultrasonic_center, ultrasonic_left]
 
 frontRight = Tyre(24, 25, 19, 50)
 frontLeft = Tyre(11, 9, 13, 50)
 backLeft = Tyre(15, 14, 12, 50)
 backRight = Tyre(23, 17, 18, 50)
 
-car = Car4W(frontRight, frontLeft, backRight, backLeft)
+car = Car4W(frontRight, frontLeft, backRight, backLeft, sensors)
 car.stop()
 #print ("Stop")
 #car.test()
@@ -58,7 +65,8 @@ class Action(tornado.websocket.WebSocketHandler):
             methodName = message
             print ("INFO: Calling " + methodName)
             method = getattr(car, methodName)
-            method()
+            if not car.collision():
+                method()
             #print ("ERR: Invalid method " + methodName)
         except tornado.websocket.WebSocketClosedError:
             pass
