@@ -6,12 +6,14 @@ class Car4W:
     frontLeft = None
     backRight = None
     backLeft = None
+    sensors = []
     
-    def __init__(self,frontRight,frontLeft,backRight,backLeft):
+    def __init__(self,frontRight,frontLeft,backRight,backLeft, sensors):
         self.frontRight = frontRight
         self.frontLeft = frontLeft
         self.backRight = backRight
         self.backLeft = backLeft
+        self.sensors = sensors
 
     def forward(self):
         self.frontLeft.forward()
@@ -58,6 +60,12 @@ class Car4W:
 
         self.frontLeft.stop()
         self.backLeft.stop()
+
+    def collision(self):
+        for sensor in self.sensors:
+            if sensor.check_collision():
+                return True
+        return False
 
     def test(self):
         from time import sleep

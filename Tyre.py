@@ -16,7 +16,7 @@ class Tyre:
             self.pwmPin = pwmPin
             self.pwm = GPIO.PWM(pwmPin, 100)
             self.pwm.start(defaultPwm)
-            print ("defaultPwn = " + str(defaultPwm))
+            #print ("defaultPwn = " + str(defaultPwm))
             GPIO.output(pwmPin, GPIO.HIGH)
 
         self.forwardPin = forwardPin
