@@ -1,4 +1,5 @@
 import RPi.GPIO as GPIO
+import logging
 GPIO.setmode(GPIO.BCM)
 
 class Car4W:
@@ -16,6 +17,11 @@ class Car4W:
         self.sensors = sensors
 
     def forward(self):
+        if "center" in self.collision():
+            logging.debug("Forward collision. instruction skipped.")
+            return
+
+        logging.debug("Forward instruction executed")
         self.frontLeft.forward()
         self.frontRight.forward()
         self.backLeft.forward()
@@ -34,6 +40,13 @@ class Car4W:
         self.backRight.stop()
 
     def forwardRight(self):
+        if "right" in self.collision():
+            logging.debug("Right collision. instruction skipped.")
+            return
+
+        logging.debug("Right instruction executed")
+
+        
         self.frontLeft.forward()
         self.backLeft.forward()
 
@@ -41,6 +54,12 @@ class Car4W:
         self.backRight.stop()
 
     def forwardLeft(self):
+    if "left" in self.collision():
+        logging.debug("Left collision. instruction skipped.")
+        return
+
+        logging.debug("Left instruction executed")
+
         self.frontRight.forward()
         self.backRight.forward()
 
@@ -62,10 +81,17 @@ class Car4W:
         self.backLeft.stop()
 
     def collision(self):
-        for sensor in self.sensors:
-            if sensor.check_collision():
-                return True
-        return False
+        ret = []
+        if self.sensor[0] and self.sensor[0].check_collision():
+            ret.append("center")
+
+        if self.sensor[1] and self.sensor[1].check_collision():
+            ret.append("left")
+        
+        if self.sensor[2] and self.sensor[2].check_collision():
+            ret.append("right")
+            
+        return ret
 
     def test(self):
         from time import sleep

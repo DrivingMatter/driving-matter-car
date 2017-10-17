@@ -26,11 +26,11 @@ from Tyre import Tyre
 from RegisterCar import RegisterCar
 from UDSensor import CollisionSensor
 
-ultrasonic_right = CollisionSensor(echo=16, trigger=26)
 ultrasonic_center = CollisionSensor(echo=21, trigger=20)
 ultrasonic_left = CollisionSensor(echo=6, trigger=5)
+ultrasonic_right = CollisionSensor(echo=16, trigger=26)
 
-sensors = [ultrasonic_right, ultrasonic_center, ultrasonic_left]
+sensors = [ultrasonic_center, ultrasonic_left, ultrasonic_right]
 
 frontRight = Tyre(24, 25, 19, 50)
 frontLeft = Tyre(11, 9, 13, 50)
