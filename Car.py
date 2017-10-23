@@ -59,7 +59,6 @@ class Car4W:
         else:
             logging.debug("forwardLeft() => Left collision")
 
-
     def backwardRight(self):
         self.frontLeft.backward()
         self.backLeft.backward()
