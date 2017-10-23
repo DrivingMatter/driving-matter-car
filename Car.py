@@ -1,4 +1,5 @@
 import RPi.GPIO as GPIO
+import logging
 GPIO.setmode(GPIO.BCM)
 
 class Car4W:
@@ -15,11 +16,16 @@ class Car4W:
         self.backLeft = backLeft
         self.sensors = sensors
 
+        self.stop()
+
     def forward(self):
-        self.frontLeft.forward()
-        self.frontRight.forward()
-        self.backLeft.forward()
-        self.backRight.forward()
+        if self.collision()[0]:
+            self.frontLeft.forward()
+            self.frontRight.forward()
+            self.backLeft.forward()
+            self.backRight.forward()
+        else:
+            logging.debug("forward() => Center collision")
 
     def backward(self):
         self.frontLeft.backward()
@@ -34,18 +40,25 @@ class Car4W:
         self.backRight.stop()
 
     def forwardRight(self):
-        self.frontLeft.forward()
-        self.backLeft.forward()
+        if self.collision()[2]:
+            self.frontLeft.forward()
+            self.backLeft.forward()
 
-        self.frontRight.stop()
-        self.backRight.stop()
+            self.frontRight.stop()
+            self.backRight.stop()
+        else:
+            logging.debug("forwardRight() => Right collision")
 
     def forwardLeft(self):
-        self.frontRight.forward()
-        self.backRight.forward()
+        if self.collision()[1]:
+            self.frontRight.forward()
+            self.backRight.forward()
 
-        self.frontLeft.stop()
-        self.backLeft.stop()
+            self.frontLeft.stop()
+            self.backLeft.stop()
+        else:
+            logging.debug("forwardLeft() => Left collision")
+
 
     def backwardRight(self):
         self.frontLeft.backward()
@@ -62,10 +75,10 @@ class Car4W:
         self.backLeft.stop()
 
     def collision(self):
+        collisions = []
         for sensor in self.sensors:
-            if sensor.check_collision():
-                return True
-        return False
+            collisions.append(sensor.check_collision())
+        return collisions
 
     def test(self):
         from time import sleep

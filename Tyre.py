@@ -2,12 +2,13 @@ import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 
 class Tyre:
-    forwardPin = None
-    backwardPin = None
-    pwm = None
-    pwmPin = None
     
     def __init__(self, forwardPin, backwardPin, pwmPin=False, defaultPwm=50):
+        self.forwardPin = None
+        self.backwardPin = None
+        self.pwm = None
+        self.pwmPin = None
+
         GPIO.setup(forwardPin, GPIO.OUT)
         GPIO.setup(backwardPin, GPIO.OUT)
         GPIO.setup(pwmPin, GPIO.OUT)
@@ -57,5 +58,5 @@ class Tyre:
 
     def __del__(self):
         self.stop()
-        GPIO.output(pwmPin, GPIO.LOW)
+        GPIO.output(self.pwmPin, GPIO.LOW)
         self.pwm.stop()

@@ -4,28 +4,45 @@ import sys
 from time import sleep
 from zeroconf import ServiceInfo, Zeroconf
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(format = '%(asctime)s %(message)s',
+                    datefmt = '%m/%d/%Y %I:%M:%S %p',
+                    filename = 'logs/register-car.log',
+                    level=logging.INFO)
 
 class RegisterCar():
     def __init__(self):
+        logging.info("RegisterCar.__init__()")
         self.zeroconf = None
         self.info = None
 
-    def register_car(self, name):
-        my_ip_address = [ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1] # Link: https://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
+    def register_car(self, name, port = 8000):
+        logging.info("RegisterCar.register_car()")
+
+        my_ip_address = None
+        while not my_ip_address:
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                s.connect(("8.8.8.8", 80))
+                my_ip_address = s.getsockname()[0]
+                s.close() 
+            except Exception:
+                sleep(1)
+                my_ip_address = None
+            
 
         if len(my_ip_address) > 0:
-            logging.info("Service IP: " + my_ip_address[0])
-            my_ip_address = socket.inet_aton(my_ip_address[0])
+            logging.info("Service IP: " + my_ip_address)
+            my_ip_address = socket.inet_aton(my_ip_address)
             
             desc = {'name': name}
             self.info = ServiceInfo("_http._tcp.local.",
                                name + " DrivingMatter._http._tcp.local.",
-                               my_ip_address, 80, 0, 0, desc)
+                               my_ip_address, port, 0, 0, desc)
 
             self.zeroconf = Zeroconf()
             logging.info("Registration of a service, press Ctrl-C to exit...")
             self.zeroconf.register_service(self.info)
+        
             return True
         else:
             logging.error("No network interface available, please connect to any network")
@@ -40,14 +57,16 @@ class RegisterCar():
         else:
             logging.error("No Zeroconf established yet")
 
-"""
-rc = RegisterCar()
-try:
-    rc.register_car("Mater")
-    while True:
-        sleep(0.1)
-except KeyboardInterrupt:
-    pass
-finally:
-    rc.unregister_car()
-"""
+
+logging.info("Current enviorment: " + __name__)
+if __name__ == "__main__":
+	# When this script is executed directly. This is executed when bootup is called
+	rc = RegisterCar()
+	try:
+	    rc.register_car("Mater")
+	    while True:
+	        sleep(0.1)
+	except KeyboardInterrupt:
+	    pass
+	finally:
+	    rc.unregister_car()
