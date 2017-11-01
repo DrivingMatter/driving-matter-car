@@ -61,13 +61,15 @@ if camera_settings:
     if camera_settings_c:
         camera_c = Camera(csc['camera_type'], csc['camera_num'],
                           csc['resolution'], csc['framerate'], csc['rotation'])
+        camera_c.start() # Starting the camera
         cameras.append(("center", camera_c))
+
 
 
 car = Car4W(tyres, sensors, camera_settings, timeframe)
 
 h = [
-    (r"/camera_c", CameraC.CameraC),
+    #(r"/camera_c", CameraC.CameraC), # State can replace this, with the new architecture....
     (r"/action", Action.Action, {'car': car}),
     (r"/state", State.State, {'car': car})
 ]

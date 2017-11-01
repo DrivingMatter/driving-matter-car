@@ -44,7 +44,7 @@
 			"__comment_camera_type": "0 mean PICAMERA, 1 mean USB (CAMERA)",
 			"camera_num": 0, 
 			"__comment_camera_num": "It is specific to USB (CAMERA), 0 mean default, 1 mean second camera and so on...",
-			"resolution": [240, 360], 
+			"resolution": [320, 240], 
 			"framerate": 15, 
 			"rotation": 180	
 		}
