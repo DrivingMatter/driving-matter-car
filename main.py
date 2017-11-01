@@ -5,40 +5,61 @@ import picamera
 import tornado.web
 import tornado.websocket
 import logging
-logging.basicConfig(level=logging.DEBUG)
-
 import signal
+import sys
+import json
+import os
+import pkgutil
 
-from Server import Server
-from Car import Car4W
-from Tyre import Tyre
-#from RegisterCar import RegisterCar
-from UDSensor import CollisionSensor
-from RequestHandler import Action, CameraOne
+from classes.Server import Server
+from classes.Car4W import Car4W
+from classes.Tyre import Tyre
+from classes.UDSensor import CollisionSensor
+from handlers import Action, CameraOne, State
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
+logging.basicConfig(level=logging.DEBUG)
 
-ultrasonic_c = CollisionSensor(echo=21, trigger=20)
-ultrasonic_l = CollisionSensor(echo=6, trigger=5)
-ultrasonic_r = CollisionSensor(echo=16, trigger=26)
+# Loading config file
+config = json.loads(open("config.json").read())
 
-sensors = [ultrasonic_c, ultrasonic_l, ultrasonic_r]
+# Loading Sensors Settings
+ss = sensor_settings = config['sensor_settings']
+ultrasonic_c = CollisionSensor(echo=ss['ultrasonic_c']['echo'], trigger=ss['ultrasonic_c']['trigger'])
+ultrasonic_l = CollisionSensor(echo=ss['ultrasonic_l']['echo'], trigger=ss['ultrasonic_l']['trigger'])
+ultrasonic_r = CollisionSensor(echo=ss['ultrasonic_r']['echo'], trigger=ss['ultrasonic_r']['trigger'])
+sensors = [("center", ultrasonic_c), ("left", ultrasonic_l), ("right", ultrasonic_r)]
 
-frontRight = Tyre(24, 25, 19, 50)
-frontLeft = Tyre(11, 9, 13, 50)
-backLeft = Tyre(15, 14, 12, 50)
-backRight = Tyre(23, 17, 18, 50)
+# Loading Tyre Settings
+ts = tyre_settings = config['tyre_settings']
+frontRight = Tyre(ts['front_right']['forwardPin'], ts['front_right']['backwardPin'], ts['front_right']['pwmPin'], ts['car_speed'])
+frontLeft = Tyre(ts['front_left']['forwardPin'], ts['front_left']['backwardPin'], ts['front_left']['pwmPin'], ts['car_speed'])
+backRight = Tyre(ts['back_right']['forwardPin'], ts['back_right']['backwardPin'], ts['back_right']['pwmPin'], ts['car_speed'])
+backLeft = Tyre(cotsnfig['back_left']['forwardPin'], ts['back_left']['backwardPin'], ts['back_left']['pwmPin'], ts['car_speed'])
+tyres = [("fr", frontRight), ("fl", frontLeft), ("br", backRight), ("bl", backLeft)]
 
-car = Car4W(frontRight, frontLeft, backRight, backLeft, sensors)
+# Loading camera settings and camera
+cs = camera_settings = config['camera_settings']
+cameras = []
+if camera_settings:
+    csc = camera_settings_c = camera_settings.get('camera_c')
+    if camera_settings_c:
+        camera_c = Camera(csc['camera_type'], csc['camera_num'], csc['resolution'], csc['framerate'], csc['resolution'])
+        cameras.append(("center", camera_c))
+
+timeframe = config['timeframe']
+
+car = Car4W(tyres, sensors, camera_settings, timeframe)
 
 handlers = [
-    (r"/camera_c", CameraOne),
-    (r"/action", Action, {'car': car})
+    (r"/camera_c", handlers.CameraC),
+    (r"/action", handlers.Action, {'car': car}),
+    (r"/state", handlers.State, {'car': car})
 ]
 
 try:
-    logging.debug("Server.py called")
-    s = Server(handlers)
+    logging.debug("main.py called")
+    s = Server(handlers, port=config['port'])
     s.start()
 except KeyboardInterrupt:
     print "Exiting";

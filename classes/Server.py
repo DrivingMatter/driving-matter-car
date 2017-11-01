@@ -3,18 +3,17 @@ import tornado.websocket
 import logging
 
 class Server():
-    def __init__(self, handler):
-        self.handler = handler
+    def __init__(self, handlers, port=8000):
+        self.handlers = handlers
+        self.port = port
         # Currently starting from crontab -e
         # self.rc = RegisterCar()
         # self.rc.register_car("Mater")
         pass
 
-    def start(self):
-        global handlers
-        
+    def start(self):        
         application = tornado.web.Application(self.handlers)
-        application.listen(8000)
+        application.listen(self.port)
 
         try:
             logging.debug("Starting Server Loop")
@@ -22,11 +21,3 @@ class Server():
         except KeyboardInterrupt:
             logging.debug("Exiting server loop")
             print "Exiting";
-
-    # Destructor
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        #self.rc.unregister_car()
-        pass

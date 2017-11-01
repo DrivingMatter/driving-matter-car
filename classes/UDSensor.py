@@ -10,7 +10,7 @@ class CollisionSensor:
         self.ultrasonic = DistanceSensor(echo=echo, trigger=trigger, max_distance=max_distance)
 
     def check_collision(self):
-        return self.ultrasonic.distance > self.collision_thresh_hold
+        return not (self.ultrasonic.distance > self.collision_thresh_hold)
             
              
 """
