@@ -10,6 +10,7 @@ from classes.Camera import Camera, PICAMERA, USB
 
 GPIO.setmode(GPIO.BCM)
 
+
 class Car4W:
     FORWARD = 1
     FORWARD_LEFT = 2
@@ -19,7 +20,7 @@ class Car4W:
     BACKWARD_RIGHT = 6
     STOPPED = 7
 
-    def __init__(self, tyres, sensors = [], cameras = [], timeframe = 0.1):
+    def __init__(self, tyres, sensors=[], cameras=[], timeframe=0.1):
         logging.debug("Car4W.__init__()")
         self.t = None
         self.camera = None
@@ -33,14 +34,14 @@ class Car4W:
         self.frontLeft = tyres[1][1]
         self.backRight = tyres[2][1]
         self.backLeft = tyres[3][1]
-    
+
         self.collision = Collision(sensors)
 
         self.cameras = cameras
 
         Thread(target=self._auto_stop).start()
-        
-        self.stop() # Stop the car, reset pins.
+
+        self.stop()  # Stop the car, reset pins.
 
     def _auto_stop(self):
         logging.debug("_auto_stop()")
@@ -48,13 +49,13 @@ class Car4W:
             if self.state in [self.FORWARD, self.FORWARD_LEFT, self.FORWARD_RIGHT]:
                 collision = self.collision.get()
                 logging.info("Ultrasonic Values: " + str(collision))
-                if collision.get("center") and self.state == self.FORWARD: 
+                if collision.get("center") and self.state == self.FORWARD:
                     logging.debug("Center collision detected, stopping.")
                     self.stop()
-                if collision.get("left") and self.state == self.FORWARD_LEFT: 
+                if collision.get("left") and self.state == self.FORWARD_LEFT:
                     logging.debug("Left collision detected, stopping.")
                     self.stop()
-                if collision.get("right") and self.state == self.FORWARD_RIGHT: 
+                if collision.get("right") and self.state == self.FORWARD_RIGHT:
                     logging.debug("Right collision detected, stopping.")
                     self.stop()
             sleep(self.timeframe)
@@ -67,16 +68,18 @@ class Car4W:
 
         # Collect sensors readings
         state['sensors'] = self.collision.get()
-        
+
         # Collect camera frames
         for camera in self.cameras:
-            name = "camera_" + camera[0] # index zero contains name eg. center, left, right
+            # index zero contains name eg. center, left, right
+            name = "camera_" + camera[0]
             state[name] = camera[1].get_frame()
-        
+
         return io.BytesIO(json.dumps(state)).getvalue()
 
     def forward(self):
-        if self.collision.get().get("center") in (False, None):  # None mean sensor doesn't exists, False mean no collision
+        # None mean sensor doesn't exists, False mean no collision
+        if self.collision.get().get("center") in (False, None):
             self.state = self.FORWARD
             self.frontLeft.forward()
             self.frontRight.forward()
@@ -87,21 +90,21 @@ class Car4W:
             logging.debug("forward() => Center collision")
 
     def backward(self):
-        self.state = self.BACKWARD    
+        self.state = self.BACKWARD
         self.frontLeft.backward()
         self.frontRight.backward()
         self.backLeft.backward()
         self.backRight.backward()
 
     def stop(self):
-        self.state = self.STOPPED    
+        self.state = self.STOPPED
         self.frontLeft.stop()
         self.frontRight.stop()
         self.backLeft.stop()
         self.backRight.stop()
 
     def forwardRight(self):
-        if self.collision.get().get("right") in (False, None): 
+        if self.collision.get().get("right") in (False, None):
             self.frontLeft.forward()
             self.backLeft.forward()
 
@@ -113,7 +116,7 @@ class Car4W:
             logging.debug("forwardRight() => Right collision")
 
     def forwardLeft(self):
-        if self.collision.get().get("left") in (False, None): 
+        if self.collision.get().get("left") in (False, None):
             self.frontRight.forward()
             self.backRight.forward()
 
@@ -142,7 +145,7 @@ class Car4W:
 
     def test(self):
         from time import sleep
-        
+
         self.forward()
         sleep(0.5)
         self.stop()
@@ -154,7 +157,7 @@ class Car4W:
         self.stop()
 
         sleep(3)
-        
+
         self.forwardRight()
         sleep(0.5)
         self.stop()
@@ -179,4 +182,3 @@ class Car4W:
 
     def __del__():
         GPIO.cleanup()
-        

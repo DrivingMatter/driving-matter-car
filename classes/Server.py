@@ -2,6 +2,7 @@ import tornado.web
 import tornado.websocket
 import logging
 
+
 class Server():
     def __init__(self, handlers, port=8000):
         self.handlers = handlers
@@ -11,7 +12,7 @@ class Server():
         # self.rc.register_car("Mater")
         pass
 
-    def start(self):        
+    def start(self):
         application = tornado.web.Application(self.handlers)
         application.listen(self.port)
 
@@ -20,4 +21,4 @@ class Server():
             tornado.ioloop.IOLoop.instance().start()
         except KeyboardInterrupt:
             logging.debug("Exiting server loop")
-            print "Exiting";
+            print "Exiting"

@@ -33,12 +33,12 @@ try:
             stream.seek(0)
             connection.write(stream.read())
             # If we've been capturing for more than 30 seconds, quit
-            #if time.time() - start > 30:
+            # if time.time() - start > 30:
             #    break
             # Reset the stream for the next capture
             stream.seek(0)
             stream.truncate()
-            print ("Sent");
+            print ("Sent")
     # Write a length of zero to the stream to signal we're done
     connection.write(struct.pack('<L', 0))
 finally:

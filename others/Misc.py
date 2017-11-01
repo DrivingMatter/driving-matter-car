@@ -7,7 +7,7 @@ def getch():
     else:
         fd = sys.stdin.fileno()
         import termios
-        
+
         oldterm = termios.tcgetattr(fd)
         newattr = termios.tcgetattr(fd)
         newattr[3] = newattr[3] & ~termios.ICANON & ~termios.ECHO
@@ -22,28 +22,29 @@ def getch():
 
     return result
 
+
 frontRight = Tyre(24, 25, 19, 1)
 frontLeft = Tyre(11, 9, 13, 1)
 backLeft = Tyre(15, 14, 12, 1)
 backRight = Tyre(23, 17, 18, 1)
 
-#t.forward()
+# t.forward()
 
-#sleep(3)
-#t.speed(50)
-#sleep(3)
-#t.speed(100)
-#sleep(3)
+# sleep(3)
+# t.speed(50)
+# sleep(3)
+# t.speed(100)
+# sleep(3)
 
 
-#t.speed(50)
-#t.forward()
-#sleep(3)
-#t.stop()
+# t.speed(50)
+# t.forward()
+# sleep(3)
+# t.stop()
 
-#frontRight.forward()
-#frontLeft.forward()
-#sleep(3)
+# frontRight.forward()
+# frontLeft.forward()
+# sleep(3)
 
 """
 frontRight.speed(100)
@@ -62,15 +63,18 @@ backRight.test()
 
 car = Car4W(frontRight, frontLeft, backRight, backLeft)
 car.stop()
-#car.test()
+# car.test()
 try:
-    sensor_left = DistanceSensor(echo=6, trigger=5, max_distance=1, threshold_distance=0.3)
-    sensor_center = DistanceSensor(echo=21, trigger=20, max_distance=1, threshold_distance=0.3)
-    sensor_right = DistanceSensor(echo=16, trigger=26, max_distance=1, threshold_distance=0.3)
+    sensor_left = DistanceSensor(
+        echo=6, trigger=5, max_distance=1, threshold_distance=0.3)
+    sensor_center = DistanceSensor(
+        echo=21, trigger=20, max_distance=1, threshold_distance=0.3)
+    sensor_right = DistanceSensor(
+        echo=16, trigger=26, max_distance=1, threshold_distance=0.3)
 
     def print_pressed_keys(e):
         print ("Here")
-	line = ', '.join(str(code) for code in keyboard._pressed_events)
+        line = ', '.join(str(code) for code in keyboard._pressed_events)
         v = str(line.strip())
         print (v == "w")
         if v == "w":
@@ -89,8 +93,8 @@ try:
             print ("Stop")
             car.stop()
 
-	print(v)
-	
+        print(v)
+
     keyboard.hook(print_pressed_keys)
     keyboard.wait('esc')
     while True:
@@ -100,12 +104,12 @@ try:
         right_distance = sensor_right.distance
 
         #print ("Distance running")
-        if 0.0 in [left_distance, center_distance, right_distance]: #Special keys (arrows, f keys, ins, del, etc.)
+        # Special keys (arrows, f keys, ins, del, etc.)
+        if 0.0 in [left_distance, center_distance, right_distance]:
             car.stop()
     keyboard.wait('esc')
 finally:
     car.stop()
-    GPIO.cleanup() # this ensures a clean exit
+    GPIO.cleanup()  # this ensures a clean exit
 
-#GPIO.cleanup() # this ensures a clean exit
-
+# GPIO.cleanup() # this ensures a clean exit

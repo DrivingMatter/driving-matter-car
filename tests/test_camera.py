@@ -1,6 +1,6 @@
 import sys
 from os import path
-sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
+sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from classes.Camera import Camera, PICAMERA, USB
 import os
 from time import sleep
@@ -10,7 +10,8 @@ import numpy as np
 import io
 from time import time
 
-c = Camera(PICAMERA, camera_num=0, resolution=(320, 240), framerate=15, rotation=None)
+c = Camera(PICAMERA, camera_num=0, resolution=(
+    320, 240), framerate=15, rotation=None)
 c.start()
 
 framerate = 0

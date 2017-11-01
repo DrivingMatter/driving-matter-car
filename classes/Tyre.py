@@ -1,8 +1,9 @@
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 
+
 class Tyre:
-    
+
     def __init__(self, forwardPin, backwardPin, pwmPin=False, defaultPwm=50):
         self.forwardPin = None
         self.backwardPin = None
@@ -12,7 +13,7 @@ class Tyre:
         GPIO.setup(forwardPin, GPIO.OUT)
         GPIO.setup(backwardPin, GPIO.OUT)
         GPIO.setup(pwmPin, GPIO.OUT)
-        
+
         if pwmPin:
             self.pwmPin = pwmPin
             self.pwm = GPIO.PWM(pwmPin, 100)
@@ -26,12 +27,12 @@ class Tyre:
     def speed(self, percent=80):
         self.pwm.stop()
         GPIO.output(self.pwmPin, GPIO.LOW)
-        
+
         self.pwm = GPIO.PWM(self.pwmPin, 100)
         self.pwm.start(percent)
         GPIO.output(self.pwmPin, GPIO.HIGH)
 
-        #self.pwm.ChangeDutyCycle(percent)
+        # self.pwm.ChangeDutyCycle(percent)
 
     def forward(self):
         GPIO.output(self.forwardPin, GPIO.HIGH)

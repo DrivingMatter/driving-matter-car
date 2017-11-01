@@ -10,6 +10,7 @@ import tornado.websocket
 from time import sleep
 import io
 
+
 class CameraC(tornado.websocket.WebSocketHandler):
     def __init__(self, *args, **kwargs):
         self.t = None
@@ -18,22 +19,22 @@ class CameraC(tornado.websocket.WebSocketHandler):
         super(CameraOne, self).__init__(*args, **kwargs)
 
     def start_camera(self):
-        logging.debug("CameraOne.start_camera()") 
+        logging.debug("CameraOne.start_camera()")
         if self.camera:
             self.camera.stop()
         self.camera = picamera.PiCamera()
         self.camera.start_preview()
         self.camera.rotation = 180
-        self.camera.resolution= (320, 240)
+        self.camera.resolution = (320, 240)
         self.camera.framerate = 15
 
     def check_origin(self, origin):
         return True
-    
+
     def on_message(self, message):
         if message == "read_camera":
-            self.start_camera();
-            sleep(0.2);
+            self.start_camera()
+            sleep(0.2)
             if self.t == None:
                 self.t = threading.Thread(target=self.loop)
                 self.t.start()
@@ -42,7 +43,7 @@ class CameraC(tornado.websocket.WebSocketHandler):
 
     def loop(self):
         stream = io.BytesIO()
-        
+
         for frame in self.camera.capture_continuous(stream, format="jpeg", use_video_port=True):
             stream.seek(0)
 
@@ -52,5 +53,5 @@ class CameraC(tornado.websocket.WebSocketHandler):
                 self.camera.close()
                 self.camera = None
                 break
-            
-            stream.truncate(0)   
+
+            stream.truncate(0)

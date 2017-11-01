@@ -10,6 +10,7 @@ import tornado.websocket
 from time import sleep
 import io
 
+
 class Action(tornado.websocket.WebSocketHandler):
     def __init__(self, *args, **kwargs):
         self.q = Queue()
@@ -19,13 +20,13 @@ class Action(tornado.websocket.WebSocketHandler):
 
     def check_origin(self, origin):
         return True
-    
+
     def _execute_actions(self):
         logging.debug("Action()._execute_action()")
         while True:
             message = self.q.get()
-            if message:    
-                logging.debug ("Message => " + message)
+            if message:
+                logging.debug("Message => " + message)
                 message = message.split(" ")
                 method_name = message[1]
                 if hasattr(self.car, method_name):
@@ -43,7 +44,7 @@ class Action(tornado.websocket.WebSocketHandler):
             self.t = Thread(target=self._execute_actions)
             self.t.start()
         try:
-            logging.debug ("Message recevied: " + message)
+            logging.debug("Message recevied: " + message)
             self.q.put(message)
         except tornado.websocket.WebSocketClosedError:
             pass

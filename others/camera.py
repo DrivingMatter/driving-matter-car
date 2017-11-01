@@ -19,7 +19,7 @@ time.sleep(0.1)
 
 start = time.time()
 print (start)
-i = 0 
+i = 0
 # capture frames from the camera
 for frame in camera.capture_continuous(stream, format="jpeg", use_video_port=True):
     # grab the raw NumPy array representing the image, then initialize the timestamp
@@ -28,23 +28,22 @@ for frame in camera.capture_continuous(stream, format="jpeg", use_video_port=Tru
     # img = frame.array
     stream.seek(0)
 
-    #593 - 30 sec else 524
+    # 593 - 30 sec else 524
     #img = np.asarray(Image.open(stream))
     #cv2.imshow("Frame", img)
 
     key = cv2.waitKey(1) & 0xFF
     # clear the stream in preparation for the next frame
-    #rawCapture.truncate(0)
-    #stream.seek(0)
+    # rawCapture.truncate(0)
+    # stream.seek(0)
     stream.truncate(0)
-
 
     if (time.time() - start) > 30:
         break
-    
+
     # if the `q` key was pressed, break from the loop
     if key == ord("q"):
-    	break
+        break
     i += 1
 print (i)
 print (time.time() - start)

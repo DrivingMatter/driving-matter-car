@@ -10,11 +10,12 @@ else:
 from threading import Thread
 import io
 
+
 class Collision:
     def __init__(self, sensors):
         self.history = True
         self.ready = False
-        self.sensors = sensors # [('center', object),...]
+        self.sensors = sensors  # [('center', object),...]
         self.stopped = False
         self.Q = Queue(maxsize=2)
         self.t = None
@@ -22,7 +23,7 @@ class Collision:
     def start(self):
         if self.t:
             return
-        
+
         self.t = Thread(target=self.update, args=())
         self.t.daemon = True
         self.t.start()
@@ -34,10 +35,10 @@ class Collision:
 
             result = {}
             for sensor in self.sensors:
-                result[sensor[0]] = sensor[1].check_collision() # 
+                result[sensor[0]] = sensor[1].check_collision()
 
             if self.Q.full():
-                self.Q.get() # open up the space
+                self.Q.get()  # open up the space
 
             self.Q.put(result)
             self.ready = True
@@ -53,7 +54,7 @@ class Collision:
         try:
             self.history = self.Q.get(0)
         except Exception:
-            pass # Queue is empty return the old value
+            pass  # Queue is empty return the old value
         return self.history
 
     def clear_queue(self):
