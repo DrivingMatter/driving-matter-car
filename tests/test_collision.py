@@ -14,13 +14,14 @@ import json
 
 config = json.loads(open("../config.json").read())
 
+# Loading Sensors Settings
+ss = sensor_settings = config['sensor_settings']
 ultrasonic_c = CollisionSensor(
-    echo=config['ultrasonic_c']['echo'], trigger=config['ultrasonic_c']['trigger'])
+    echo=ss['ultrasonic_c']['echo'], trigger=ss['ultrasonic_c']['trigger'])
 ultrasonic_l = CollisionSensor(
-    echo=config['ultrasonic_l']['echo'], trigger=config['ultrasonic_l']['trigger'])
+    echo=ss['ultrasonic_l']['echo'], trigger=ss['ultrasonic_l']['trigger'])
 ultrasonic_r = CollisionSensor(
-    echo=config['ultrasonic_r']['echo'], trigger=config['ultrasonic_r']['trigger'])
-
+    echo=ss['ultrasonic_r']['echo'], trigger=ss['ultrasonic_r']['trigger'])
 sensors = [("center", ultrasonic_c),
            ("left", ultrasonic_l), ("right", ultrasonic_r)]
 

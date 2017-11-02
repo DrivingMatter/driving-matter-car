@@ -9,10 +9,10 @@ else:
     from Queue import Queue
 from threading import Thread
 import io
+from time import sleep
 
 PICAMERA = 0
 USB = 1
-
 
 class Camera():
     def __init__(self, camera_type, camera_num=0, resolution=(320, 240), framerate=15, rotation=None):
@@ -32,8 +32,8 @@ class Camera():
         elif self.camera_type == USB:
             w, h = resolution
             self.camera = cv2.VideoCapture(camera_num)
-            camera.set(3, w)
-            camera.set(4, h)
+            self.camera.set(3, w)
+            self.camera.set(4, h)
         else:
             raise EnviormentError("Invalid camera type")
 
@@ -66,6 +66,8 @@ class Camera():
 
             stream.truncate(0)
 
+            self.ready = True
+
     def update_usb(self):
         stream = io.BytesIO()
         while True:
@@ -83,7 +85,10 @@ class Camera():
                 img.save(sio, "JPEG")
 
                 stream.seek(0)
-                self.Q.put(stream.getvalue())
+                
+                if not self.Q.full():
+                    self.Q.put(stream.getvalue())
+                
                 stream.truncate(0)
 
                 self.ready = True
@@ -104,7 +109,10 @@ class Camera():
         return self.ready
 
     def get_frame(self):
-        return self.Q.get()
+        #try:
+        return self.Q.get(0)
+        #except Exception:
+        #    return None
 
     def clear_queue(self):
         self.Q.clear()

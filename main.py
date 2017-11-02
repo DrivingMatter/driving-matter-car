@@ -66,7 +66,7 @@ if camera_settings:
 
 
 
-car = Car4W(tyres, sensors, camera_settings, timeframe)
+car = Car4W(tyres, sensors, cameras, timeframe)
 
 h = [
     #(r"/camera_c", CameraC.CameraC), # State can replace this, with the new architecture....

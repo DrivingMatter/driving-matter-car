@@ -11,7 +11,7 @@ import io
 from time import time
 
 c = Camera(PICAMERA, camera_num=0, resolution=(
-    320, 240), framerate=15, rotation=None)
+    320, 240), framerate=15, rotation=180)
 c.start()
 
 framerate = 0

@@ -12,12 +12,12 @@ import io
 
 
 class Collision:
-    def __init__(self, sensors):
+    def __init__(self, sensors, queue_size=2):
         self.history = True
         self.ready = False
         self.sensors = sensors  # [('center', object),...]
         self.stopped = False
-        self.Q = Queue(maxsize=2)
+        self.Q = Queue(maxsize=queue_size)
         self.t = None
 
     def start(self):
@@ -55,6 +55,10 @@ class Collision:
             self.history = self.Q.get(0)
         except Exception:
             pass  # Queue is empty return the old value
+
+        if not self.history:
+            return {-1, -1, -1}
+            
         return self.history
 
     def clear_queue(self):

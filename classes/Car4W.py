@@ -36,8 +36,11 @@ class Car4W:
         self.backLeft = tyres[3][1]
 
         self.collision = Collision(sensors)
+        self.collision.start()
 
         self.cameras = cameras
+        for camera in self.cameras:
+            camera.start()
 
         Thread(target=self._auto_stop).start()
 
@@ -66,6 +69,15 @@ class Car4W:
         logging.debug("Collecting state")
         state = {}
 
+        stream = io.BytesIO()
+
+        sensors = self.collision.get()
+        stream.write(len(sensors))
+        for sensor in sensors:
+            stream.write(sensor[0]) # Title #TODO add extra spaces
+            stream.write(sensor[1]) # TODO:
+
+            
         # Collect sensors readings
         state['sensors'] = self.collision.get()
 
@@ -75,7 +87,8 @@ class Car4W:
             name = "camera_" + camera[0]
             state[name] = camera[1].get_frame()
 
-        return io.BytesIO(json.dumps(state)).getvalue()
+        #state #convert oto bytes/binary
+        return stream.getvalue() # TODO: Fix this buffer problem
 
     def forward(self):
         # None mean sensor doesn't exists, False mean no collision

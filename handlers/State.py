@@ -24,17 +24,18 @@ class State(tornado.websocket.WebSocketHandler):
     def on_message(self, message):
         if message == "send_state":
             self.write_message(self.car.get_state(), True)
+            logging.debug("Sent send_state")
         elif message == "read_state":
-        	if self.t == None:
+            if self.t == None:
                 self.t = threading.Thread(target=self.loop)
                 self.t.start()
         elif message == "stop_read_state":
-        	self.stopped = True
+            self.stopped = True
 
     def loop(self):
-    	while True:
-    		if self.stopped:
-    			self.t = None
-    			self.stopped = False
-    			return
-			self.write_message(self.car.get_state(), True)
+        while True:
+            if self.stopped:
+                self.t = None
+                self.stopped = False
+                return
+            self.write_message(self.car.get_state(), True)
