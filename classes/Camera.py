@@ -110,7 +110,7 @@ class Camera():
 
     def get_frame(self):
         #try:
-        return self.Q.get(0)
+        return self.Q.get()
         #except Exception:
         #    return None
 

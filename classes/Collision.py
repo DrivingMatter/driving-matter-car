@@ -52,13 +52,9 @@ class Collision:
 
     def get(self):
         try:
-            self.history = self.Q.get(0)
+            self.history = self.Q.get(0) # TODO: handle empty value when exceptions called
         except Exception:
             pass  # Queue is empty return the old value
-
-        if not self.history:
-            return {-1, -1, -1}
-            
         return self.history
 
     def clear_queue(self):

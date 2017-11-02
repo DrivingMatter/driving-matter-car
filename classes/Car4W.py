@@ -40,7 +40,7 @@ class Car4W:
 
         self.cameras = cameras
         for camera in self.cameras:
-            camera.start()
+            camera[1].start()
 
         Thread(target=self._auto_stop).start()
 
@@ -67,28 +67,54 @@ class Car4W:
 
     def get_state(self):
         logging.debug("Collecting state")
-        state = {}
-
+        result = -1
         stream = io.BytesIO()
 
         sensors = self.collision.get()
-        stream.write(len(sensors))
-        for sensor in sensors:
-            stream.write(sensor[0]) # Title #TODO add extra spaces
-            stream.write(sensor[1]) # TODO:
+        if type(sensors).__name__ == "dict":
+            sensor_count = len(sensors)
+        else:
+            sensor_count = 0
 
-            
-        # Collect sensors readings
-        state['sensors'] = self.collision.get()
+        stream.write(self._int_to_bytes(sensor_count))
+        if sensor_count != 0:
+            for key in sensors:
+                name = key
+                value = sensors[key]
+                stream.write(self._get_string_for_bytes(name))
 
-        # Collect camera frames
+                if value == True: result = 1
+                elif value == False: result = 0
+                else: result = 999
+                stream.write(self._int_to_bytes(result)) #object # TODO:
+
+        camera_count = len(self.cameras)
+        if not sensor_count:
+            sensor_count = 0
+
+        stream.write(self._int_to_bytes(camera_count))
         for camera in self.cameras:
             # index zero contains name eg. center, left, right
             name = "camera_" + camera[0]
-            state[name] = camera[1].get_frame()
+            stream.write(self._get_string_for_bytes(name))
 
-        #state #convert oto bytes/binary
+            frame = camera[1].get_frame()
+            frame_bytes_count = len(frame)
+            print (frame_bytes_count)
+            stream.write(self._int_to_bytes(frame_bytes_count))
+            stream.write(frame)
+
         return stream.getvalue() # TODO: Fix this buffer problem
+
+    def _get_string_for_bytes(self, name, size = 16):
+        space_count = size - len(name)
+        assert(space_count >= 0)
+        return name + (" " * space_count)
+
+
+    def _int_to_bytes(self, val, size = 4):
+        return ('%%0%dx' % (size << 1) % val).decode('hex')[-size:]
+        # return (val).to_bytes(size, byteorder='big')
 
     def forward(self):
         # None mean sensor doesn't exists, False mean no collision
