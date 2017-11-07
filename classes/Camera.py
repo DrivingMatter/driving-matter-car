@@ -6,7 +6,7 @@ import cv2
 if sys.version_info >= (3, 0):
     from queue import Queue
 else:
-    from Queue import Queue
+    from queue import Queue
 from threading import Thread
 import io
 from time import sleep

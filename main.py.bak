@@ -81,4 +81,4 @@ if __name__ == "__main__":
         s = Server(h, port=port)
         s.start()
     except KeyboardInterrupt:
-        print("Exiting")
+        print "Exiting"

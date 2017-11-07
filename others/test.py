@@ -1,3 +1,3 @@
 import sys
 
-print (sys.stdin.fileno())
+print((sys.stdin.fileno()))
