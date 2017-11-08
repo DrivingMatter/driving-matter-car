@@ -5,7 +5,7 @@ GPIO.setmode(GPIO.BCM)  # Set GPIO pin numbering
 TRIG = 20  # Associate pin 23 to TRIG
 ECHO = 21  # Associate pin 24 to ECHO
 
-print("Distance measurement in progress")
+print "Distance measurement in progress"
 
 GPIO.setup(TRIG, GPIO.OUT)  # Set pin as GPIO out
 GPIO.setup(ECHO, GPIO.IN)  # Set pin as GPIO in
@@ -13,7 +13,7 @@ GPIO.setup(ECHO, GPIO.IN)  # Set pin as GPIO in
 while True:
 
     GPIO.output(TRIG, False)  # Set TRIG as LOW
-    print("Waitng For Sensor To Settle")
+    print "Waitng For Sensor To Settle"
     time.sleep(2)  # Delay of 2 seconds
 
     GPIO.output(TRIG, True)  # Set TRIG as HIGH
@@ -34,6 +34,6 @@ while True:
 
     if distance > 2 and distance < 400:  # Check whether the distance is within range
         # Print distance with 0.5 cm calibration
-        print("Distance:", pulse_duration, "cm")
+        print "Distance:", pulse_duration, "cm"
     else:
-        print("Out Of Range")  # display out of range
+        print "Out Of Range"  # display out of range

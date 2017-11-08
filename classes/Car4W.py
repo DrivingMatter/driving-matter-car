@@ -5,9 +5,8 @@ from threading import Thread
 import json
 import picamera
 import io
-from .Collision import Collision
+from Collision import Collision
 from classes.Camera import Camera, PICAMERA, USB
-import pickle
 
 GPIO.setmode(GPIO.BCM)
 
@@ -68,21 +67,44 @@ class Car4W:
 
     def get_state(self):
         logging.debug("Collecting state")
-
-        state = {}
+        result = -1
+        stream = io.BytesIO()
 
         sensors = self.collision.get()
         if type(sensors).__name__ == "dict":
-            state['sensors'] = sensors
+            sensor_count = len(sensors)
+        else:
+            sensor_count = 0
 
+        stream.write(self._int_to_bytes(sensor_count))
+        if sensor_count != 0:
+            for key in sensors:
+                name = key
+                value = sensors[key]
+                stream.write(self._get_string_for_bytes(name))
+
+                if value == True: result = 1
+                elif value == False: result = 0
+                else: result = 999
+                stream.write(self._int_to_bytes(result)) #object # TODO:
+
+        camera_count = len(self.cameras)
+        if not sensor_count:
+            sensor_count = 0
+
+        stream.write(self._int_to_bytes(camera_count))
         for camera in self.cameras:
             # index zero contains name eg. center, left, right
             name = "camera_" + camera[0]
+            stream.write(self._get_string_for_bytes(name))
+
             frame = camera[1].get_frame()
+            frame_bytes_count = len(frame)
+            print (frame_bytes_count)
+            stream.write(self._int_to_bytes(frame_bytes_count))
+            stream.write(frame)
 
-            state[name] = frame
-
-        return pickle.dumps(state) # TODO: Fix this buffer problem
+        return stream.getvalue() # TODO: Fix this buffer problem
 
     def _get_string_for_bytes(self, name, size = 16):
         space_count = size - len(name)

@@ -21,4 +21,4 @@ class Server():
             tornado.ioloop.IOLoop.instance().start()
         except KeyboardInterrupt:
             logging.debug("Exiting server loop")
-            print("Exiting")
+            print "Exiting"

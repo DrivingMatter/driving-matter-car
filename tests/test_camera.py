@@ -30,4 +30,4 @@ while True:
         stream.seek(0)
         key = cv2.waitKey(1) & 0xFF
 
-        print(("FPS: " + str(framerate / (time() - start))))
+        print ("FPS: " + str(framerate / (time() - start)))

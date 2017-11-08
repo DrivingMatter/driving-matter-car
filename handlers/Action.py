@@ -3,7 +3,7 @@ import logging
 import threading
 import picamera
 from threading import Thread
-from queue import Queue
+from Queue import Queue
 import picamera
 import tornado.web
 import tornado.websocket

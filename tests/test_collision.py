@@ -30,5 +30,5 @@ c.start()
 
 while True:
     if c.ready and c.more():
-        print((c.get()))
+        print (c.get())
     sleep(0.1)

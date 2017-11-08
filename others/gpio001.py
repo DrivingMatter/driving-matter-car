@@ -10,28 +10,28 @@ GPIO.setup(18, GPIO.OUT)
 
 
 def right(x):
-    print("right")
+    print "right"
     GPIO.output(18, GPIO.HIGH)
     sleep(x)
     GPIO.output(18, GPIO.LOW)
 
 
 def left(x):
-    print("left")
+    print "left"
     GPIO.output(16, GPIO.HIGH)
     sleep(x)
     GPIO.output(16, GPIO.LOW)
 
 
 def forward(x):
-    print("forward")
+    print "forward"
     GPIO.output(13, GPIO.HIGH)
     sleep(x)
     GPIO.output(13, GPIO.LOW)
 
 
 def reverse(x):
-    print("reverse")
+    print "reverse"
     GPIO.output(15, GPIO.HIGH)
     sleep(x)
     GPIO.output(15, GPIO.LOW)
@@ -46,7 +46,7 @@ try:
     sleep(0.5)
     reverse(3)
 except:
-    print("Other error or exception occurred!")
+    print "Other error or exception occurred!"
 
 finally:
     GPIO.cleanup()  # this ensures a clean exit

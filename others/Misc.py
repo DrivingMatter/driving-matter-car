@@ -76,7 +76,7 @@ try:
         print ("Here")
         line = ', '.join(str(code) for code in keyboard._pressed_events)
         v = str(line.strip())
-        print((v == "w"))
+        print (v == "w")
         if v == "w":
             print ("Forward")
             car.forward()

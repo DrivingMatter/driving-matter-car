@@ -3,7 +3,7 @@ import logging
 import threading
 import picamera
 from threading import Thread
-from queue import Queue
+from Queue import Queue
 import picamera
 import tornado.web
 import tornado.websocket
@@ -93,7 +93,7 @@ class CameraOne(tornado.websocket.WebSocketHandler):
                 self.t = threading.Thread(target=self.loop)
                 self.t.start()
         else:
-            print(("Unsupported function: " + message))
+            print("Unsupported function: " + message)
 
     def loop(self):
         stream = io.BytesIO()

@@ -46,4 +46,4 @@ for frame in camera.capture_continuous(stream, format="jpeg", use_video_port=Tru
         break
     i += 1
 print (i)
-print((time.time() - start))
+print (time.time() - start)

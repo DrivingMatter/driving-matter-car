@@ -15,10 +15,10 @@ ultrasonicL = DistanceSensor(
 
 # ultrasonic.distance
 while True:
-    print(("=" * 80))
-    print(("Right :", ultrasonicR.distance > 0.2))
-    print(("Center :", ultrasonicC.distance > 0.2))
-    print(("Left :", ultrasonicL.distance > 0.2))
+    print("=" * 80)
+    print("Right :", ultrasonicR.distance > 0.2)
+    print("Center :", ultrasonicC.distance > 0.2)
+    print("Left :", ultrasonicL.distance > 0.2)
     if 0.0 in [ultrasonicR.distance, ultrasonicC.distance, ultrasonicL.distance]:
         print("Yes")
 
