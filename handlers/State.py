@@ -7,15 +7,17 @@ from Queue import Queue
 import picamera
 import tornado.web
 import tornado.websocket
+from tornado.ioloop import PeriodicCallback
 from time import sleep
 import io
-
 
 class State(tornado.websocket.WebSocketHandler):
     def __init__(self, *args, **kwargs):
         self.stopped = False
         self.t = None
         self.car = kwargs.pop('car')
+
+        self.inf_loop = PeriodicCallback(self.loop, callback_time=50)
         super(State, self).__init__(*args, **kwargs)
 
     def check_origin(self, origin):
@@ -23,19 +25,16 @@ class State(tornado.websocket.WebSocketHandler):
 
     def on_message(self, message):
         if message == "send_state":
-            self.write_message(self.car.get_state(), True)
+            state = self.car.get_state()
+            self.write_message(state, True)
             logging.debug("Sent send_state")
         elif message == "read_state":
-            if self.t == None:
-                self.t = threading.Thread(target=self.loop)
-                self.t.start()
+            if not self.inf_loop.is_running():
+                self.inf_loop.start()
         elif message == "stop_read_state":
-            self.stopped = True
+            self.inf_loop.stop()
 
     def loop(self):
-        while True:
-            if self.stopped:
-                self.t = None
-                self.stopped = False
-                return
-            self.write_message(self.car.get_state(), True)
+        state = self.car.get_state()
+        print ("Sending data")
+        self.write_message(state, True)

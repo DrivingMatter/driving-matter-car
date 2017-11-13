@@ -16,10 +16,16 @@ from classes.Car4W import Car4W
 from classes.Tyre import Tyre
 from classes.Camera import Camera
 from classes.UDSensor import CollisionSensor
+from classes.RegisterCar import RegisterCar
+
 from handlers import Action, CameraC, State
 
+# Work only on python 2 because using pickle and bytes difference in between python versions.
+assert(sys.version_info.major == 2)
+
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+
 signal.signal(signal.SIGINT, signal.SIG_DFL)
-logging.basicConfig(level=logging.DEBUG)
 
 # Loading config file
 config = json.loads(open("config.json").read())
@@ -75,10 +81,12 @@ h = [
 ]
 
 if __name__ == "__main__":
-
     try:
         logging.debug("main.py called")
+        rc = RegisterCar()
+        rc.register_car("Mater")
         s = Server(h, port=port)
         s.start()
     except KeyboardInterrupt:
+        #rc.unregister_car()
         print "Exiting"

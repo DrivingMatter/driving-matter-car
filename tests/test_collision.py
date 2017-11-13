@@ -17,18 +17,25 @@ config = json.loads(open("../config.json").read())
 # Loading Sensors Settings
 ss = sensor_settings = config['sensor_settings']
 ultrasonic_c = CollisionSensor(
-    echo=ss['ultrasonic_c']['echo'], trigger=ss['ultrasonic_c']['trigger'])
+   echo=ss['ultrasonic_c']['echo'], trigger=ss['ultrasonic_c']['trigger'])
 ultrasonic_l = CollisionSensor(
-    echo=ss['ultrasonic_l']['echo'], trigger=ss['ultrasonic_l']['trigger'])
+   echo=ss['ultrasonic_l']['echo'], trigger=ss['ultrasonic_l']['trigger'])
 ultrasonic_r = CollisionSensor(
-    echo=ss['ultrasonic_r']['echo'], trigger=ss['ultrasonic_r']['trigger'])
+     echo=ss['ultrasonic_r']['echo'], trigger=ss['ultrasonic_r']['trigger'])
 sensors = [("center", ultrasonic_c),
            ("left", ultrasonic_l), ("right", ultrasonic_r)]
 
 c = Collision(sensors)
 c.start()
 
+#s = ultrasonic_c
+#print (ss['ultrasonic_r']['echo'])
+#print (ss['ultrasonic_r']['trigger'])
+
+print ("Started...")
 while True:
-    if c.ready and c.more():
-        print (c.get())
+    print (c.get())
     sleep(0.1)
+    #print("Collison:")
+    #print (s.check_collision())
+

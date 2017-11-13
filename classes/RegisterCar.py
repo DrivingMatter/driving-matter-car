@@ -4,11 +4,7 @@ import sys
 from time import sleep
 from zeroconf import ServiceInfo, Zeroconf
 
-logging.basicConfig(format='%(asctime)s %(message)s',
-                    datefmt='%m/%d/%Y %I:%M:%S %p',
-                    filename='logs/register-car.log',
-                    level=logging.INFO)
-
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 class RegisterCar():
     def __init__(self):

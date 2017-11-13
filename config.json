@@ -4,16 +4,16 @@
 	"car_speed": 50,
 	"sensor_settings": {
 		"ultrasonic_c": {
-			"echo": 21,
-			"trigger": 20
+			"echo": 27,
+			"trigger": 22
 		},
 		"ultrasonic_l": {
-			"echo": 6,
-			"trigger": 5
-		},
-		"ultrasonic_r": {
 			"echo": 16,
 			"trigger": 26
+		},
+		"ultrasonic_r": {
+			"echo": 6,
+			"trigger": 5
 		}
 	},
 	"tyre_settings": {

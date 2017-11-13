@@ -9,11 +9,11 @@ else:
     from Queue import Queue
 from threading import Thread
 import io
-
+from time import sleep
 
 class Collision:
     def __init__(self, sensors, queue_size=2):
-        self.history = True
+        self.history = None
         self.ready = False
         self.sensors = sensors  # [('center', object),...]
         self.stopped = False
@@ -25,7 +25,7 @@ class Collision:
             return
 
         self.t = Thread(target=self.update, args=())
-        self.t.daemon = True
+        #self.t.daemon = True
         self.t.start()
 
     def update(self):
@@ -43,6 +43,8 @@ class Collision:
             self.Q.put(result)
             self.ready = True
 
+            sleep(0.1)
+
     def stop(self):
         self.stopped = True
         self.t = None
@@ -51,11 +53,13 @@ class Collision:
         return self.Q.qsize() > 0
 
     def get(self):
+        result = None
         try:
-            self.history = self.Q.get(0) # TODO: handle empty value when exceptions called
+            result = self.Q.get(0) # TODO: handle empty value when exceptions called
+            self.history = result
         except Exception:
-            pass  # Queue is empty return the old value
-        return self.history
+            return self.history
+        return result
 
     def clear_queue(self):
         self.Q.clear()

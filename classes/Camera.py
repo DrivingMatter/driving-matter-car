@@ -50,7 +50,7 @@ class Camera():
             f = self.update_usb
 
         self.t = Thread(target=f, args=())
-        self.t.daemon = True
+        #self.t.daemon = True
         self.t.start()
 
     def update_picamera(self):
