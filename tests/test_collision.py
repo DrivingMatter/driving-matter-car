@@ -11,6 +11,9 @@ import numpy as np
 import io
 from time import time
 import json
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 config = json.loads(open("../config.json").read())
 
@@ -34,8 +37,8 @@ c.start()
 
 print ("Started...")
 while True:
-    print (c.get())
-    sleep(0.1)
+    print (str(c.get()) + '    ' + str(time()))
+    sleep(0.01)
     #print("Collison:")
     #print (s.check_collision())
 

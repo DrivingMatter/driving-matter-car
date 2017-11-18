@@ -10,6 +10,7 @@ else:
 from threading import Thread
 import io
 from time import sleep
+import logging
 
 class Collision:
     def __init__(self, sensors, queue_size=2):
@@ -37,29 +38,25 @@ class Collision:
             for sensor in self.sensors:
                 result[sensor[0]] = sensor[1].check_collision()
 
-            if self.Q.full():
-                self.Q.get()  # open up the space
-
             self.Q.put(result)
+            #logging.info("Collision(): Info added to queue")
+
             self.ready = True
 
-            sleep(0.1)
+            sleep(2) # Required by UD Sensor Hardware
 
     def stop(self):
         self.stopped = True
         self.t = None
 
     def more(self):
-        return self.Q.qsize() > 0
+        return not self.Q.empty()
 
     def get(self):
-        result = None
-        try:
-            result = self.Q.get(0) # TODO: handle empty value when exceptions called
-            self.history = result
-        except Exception:
-            return self.history
-        return result
-
+        logging.info("Collision Queue: " + str(self.Q.qsize()))
+        if not self.Q.empty():
+            self.history = self.Q.get() # TODO: handle empty value when exceptions called
+        return self.history
+        
     def clear_queue(self):
         self.Q.clear()

@@ -23,7 +23,7 @@ from handlers import Action, CameraC, State
 # Work only on python 2 because using pickle and bytes difference in between python versions.
 assert(sys.version_info.major == 2)
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
@@ -69,8 +69,6 @@ if camera_settings:
                           csc['resolution'], csc['framerate'], csc['rotation'])
         camera_c.start() # Starting the camera
         cameras.append(("center", camera_c))
-
-
 
 car = Car4W(tyres, sensors, cameras, timeframe)
 

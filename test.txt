@@ -1,0 +1,1 @@
+INFO:root:Current enviorment: classes.RegisterCar

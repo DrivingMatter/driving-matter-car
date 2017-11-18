@@ -15,13 +15,14 @@ PICAMERA = 0
 USB = 1
 
 class Camera():
-    def __init__(self, camera_type, camera_num=0, resolution=(320, 240), framerate=15, rotation=None):
+    def __init__(self, camera_type, camera_num=0, resolution=(320, 240), framerate=20, rotation=None):
         self.ready = False
         self.camera = None
         self.camera_type = camera_type
         self.stopped = False
-        self.Q = Queue(maxsize=framerate * 2)
+        self.Q = Queue(maxsize=2)
         self.t = None
+        self.history = None
 
         if self.camera_type == PICAMERA:
             self.camera = picamera.PiCamera()
@@ -61,8 +62,8 @@ class Camera():
 
             stream.seek(0)
 
-            if not self.Q.full():
-                self.Q.put(stream.getvalue())
+            self.Q.put(stream.getvalue())
+            logging.info("Camera(): Frame added to queue")
 
             stream.truncate(0)
 
@@ -86,8 +87,11 @@ class Camera():
 
                 stream.seek(0)
                 
-                if not self.Q.full():
-                    self.Q.put(stream.getvalue())
+                if self.Q.full():
+                    self.Q.get(0)
+
+                self.Q.put(stream.getvalue())
+                logging.info("Camera(): Frame added to queue")
                 
                 stream.truncate(0)
 
@@ -103,16 +107,16 @@ class Camera():
         self.t = None
 
     def more(self):
-        return self.Q.qsize() > 0
+        return not self.Q.empty()
 
     def ready(self):
         return self.ready
 
     def get_frame(self):
-        #try:
-        return self.Q.get()
-        #except Exception:
-        #    return None
+        logging.info("Camera Queue: " + str(self.Q.qsize()))
+        if not self.Q.empty():
+            self.history = self.Q.get()
+        return self.history
 
     def clear_queue(self):
         self.Q.clear()

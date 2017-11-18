@@ -8,6 +8,7 @@ import io
 from Collision import Collision
 from classes.Camera import Camera, PICAMERA, USB
 import pickle
+import time
 
 GPIO.setmode(GPIO.BCM)
 
@@ -67,21 +68,26 @@ class Car4W:
             # TODO: Sent the new state
 
     def get_state(self):
-        logging.debug("Collecting state")
+        start_time = time.time()
+        #logging.debug("Collecting state")
 
         state = {}
 
+        # ADDING: Car state
+        state['car_state'] = self.state # Put car state eg FOWARD, RIGHT, LEFT
+
+        # ADDING: Sensors details
         sensors = self.collision.get()
         state['sensors'] = sensors
-        state['car_state'] = self.state
-
+        
+        # ADDING: Camera data
         for camera in self.cameras:
             name = "camera_" + camera[0]
             frame = camera[1].get_frame()
-
             state[name] = frame
 
-        return pickle.dumps(state) # TODO: Fix this buffer problem
+        logging.debug("Received State in {} seconds".format(time.time() - start_time))
+        return state # converted to pickle in State.py
 
     def _get_string_for_bytes(self, name, size = 16):
         space_count = size - len(name)

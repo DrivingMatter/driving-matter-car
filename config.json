@@ -1,7 +1,7 @@
 {
 	"timeframe": 0.1,
 	"port": 8000,
-	"car_speed": 50,
+	"car_speed": 25,
 	"sensor_settings": {
 		"ultrasonic_c": {
 			"echo": 27,
