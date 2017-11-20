@@ -10,6 +10,7 @@ import sys
 import json
 import os
 import pkgutil
+import socket
 
 from classes.Server import Server
 from classes.Car4W import Car4W
@@ -18,7 +19,7 @@ from classes.Camera import Camera
 from classes.UDSensor import CollisionSensor
 from classes.RegisterCar import RegisterCar
 
-from handlers import Action, CameraC, State
+from handlers import Action, State
 
 # Work only on python 2 because using pickle and bytes difference in between python versions.
 assert(sys.version_info.major == 2)
@@ -30,6 +31,7 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 # Loading config file
 config = json.loads(open("config.json").read())
 
+rps_ms = config['rps_ms']
 car_speed = config['car_speed']
 timeframe = config['timeframe']
 port = config['port']
@@ -59,30 +61,29 @@ tyres = [("fr", frontRight), ("fl", frontLeft),
          ("br", backRight), ("bl", backLeft)]
 
 # Loading camera settings and camera
-cs = camera_settings = config['camera_settings']
+camera_settings = config['camera_settings']
 
 cameras = []
 if camera_settings:
-    csc = camera_settings_c = camera_settings.get('camera_c')
-    if camera_settings_c:
-        camera_c = Camera(csc['camera_type'], csc['camera_num'],
-                          csc['resolution'], csc['framerate'], csc['rotation'])
-        camera_c.start() # Starting the camera
-        cameras.append(("center", camera_c))
+    for key in camera_settings:
+        c = camera_settings[key]
+        camera = Camera(c['camera_type'], c['camera_num'],
+                          c['resolution'], c['framerate'], c['rotation'])
+        camera.start() # Starting the camera
+        cameras.append((key, camera))        
 
 car = Car4W(tyres, sensors, cameras, timeframe)
 
 h = [
-    #(r"/camera_c", CameraC.CameraC), # State can replace this, with the new architecture....
     (r"/action", Action.Action, {'car': car}),
-    (r"/state", State.State, {'car': car})
+    (r"/state", State.State, {'car': car, 'rps_ms': rps_ms}) # rps_ms: Request Per Seconds Millisecond
 ]
 
 if __name__ == "__main__":
     try:
         logging.debug("main.py called")
         rc = RegisterCar()
-        rc.register_car("Mater")
+        rc.register_car(socket.gethostname())
         s = Server(h, port=port)
         s.start()
     except KeyboardInterrupt:

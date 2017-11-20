@@ -19,6 +19,7 @@ class State(tornado.websocket.WebSocketHandler):
         self.stopped = False
         self.t = None
         self.car = kwargs.pop('car')
+        self.rps_ms = kwargs.pop('rps_ms') # Request Per Seconds Milliseconds
 
         self.timer = [0, 0]
         self.timer_index = 0
@@ -26,7 +27,7 @@ class State(tornado.websocket.WebSocketHandler):
 
         self.total_requests = 0
 
-        self.inf_loop = PeriodicCallback(self.loop, callback_time=100) # 50 ms = 15 Request Per Seconds; 65 ms = 15 Request Per Seconds 
+        self.inf_loop = PeriodicCallback(self.loop, callback_time=self.rps_ms) # 50 ms = 15 Request Per Seconds; 65 ms = 15 Request Per Seconds 
 
         super(State, self).__init__(*args, **kwargs)
 

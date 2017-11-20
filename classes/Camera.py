@@ -83,7 +83,7 @@ class Camera():
                     return
 
                 img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-                img.save(sio, "JPEG")
+                img.save(stream, "JPEG")
 
                 stream.seek(0)
                 

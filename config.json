@@ -1,4 +1,6 @@
 {
+	"rps_ms": 100,
+	"__rps_ms": "Generate request every x milliseconds for State Websocket",
 	"timeframe": 0.1,
 	"port": 8000,
 	"car_speed": 25,
@@ -45,8 +47,17 @@
 			"camera_num": 0, 
 			"__comment_camera_num": "It is specific to USB (CAMERA), 0 mean default, 1 mean second camera and so on...",
 			"resolution": [320, 240], 
-			"framerate": 15, 
+			"framerate": 10, 
 			"rotation": 180	
+		},
+		"camera_l": {
+			"camera_type": 1,
+			"__comment_camera_type": "0 mean PICAMERA, 1 mean USB (CAMERA)",
+			"camera_num": 0, 
+			"__comment_camera_num": "It is specific to USB (CAMERA), 0 mean default, 1 mean second camera and so on...",
+			"resolution": [320, 240], 
+			"framerate": 10, 
+			"rotation": 0	
 		}
 	}
 }
