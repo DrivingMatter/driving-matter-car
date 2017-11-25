@@ -34,6 +34,7 @@ class CameraC(tornado.websocket.WebSocketHandler):
     def on_message(self, message):
         if message == "read_camera":
             self.start_camera()
+            logging.debug("CameraOne.__init__()")
             sleep(0.2)
             if self.t == None:
                 self.t = threading.Thread(target=self.loop)

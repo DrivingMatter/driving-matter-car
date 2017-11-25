@@ -15,7 +15,7 @@ PICAMERA = 0
 USB = 1
 
 class Camera():
-    def __init__(self, camera_type, camera_num=0, resolution=(320, 240), framerate=20, rotation=None):
+    def __init__(self, camera_type, camera_num=0, resolution=(320, 240), framerate=20, rotation=0):
         self.ready = False
         self.camera = None
         self.camera_type = camera_type
@@ -23,12 +23,16 @@ class Camera():
         self.Q = Queue(maxsize=2)
         self.t = None
         self.history = None
+        self.rotation = rotation
+        
+        self.framerate_ms = 1.0/float(framerate)
 
         if self.camera_type == PICAMERA:
             self.camera = picamera.PiCamera()
             self.camera.resolution = resolution
             if rotation:
                 self.camera.rotation = rotation
+                
             self.camera.framerate = framerate
         elif self.camera_type == USB:
             w, h = resolution
@@ -38,7 +42,7 @@ class Camera():
         else:
             raise EnviormentError("Invalid camera type")
 
-        logging.debug("CameraOne.__init__()")
+        #logging.debug("CameraOne.__init__()")
 
     def start(self):
         if self.t:
@@ -63,7 +67,7 @@ class Camera():
             stream.seek(0)
 
             self.Q.put(stream.getvalue())
-            logging.info("Camera(): Frame added to queue")
+            #logging.info("Camera(): Frame added to queue")
 
             stream.truncate(0)
 
@@ -82,6 +86,7 @@ class Camera():
                     self.stop()
                     return
 
+                frame = cv2.flip(frame, self.rotation)
                 img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
                 img.save(stream, "JPEG")
 
@@ -91,12 +96,13 @@ class Camera():
                     self.Q.get(0)
 
                 self.Q.put(stream.getvalue())
-                logging.info("Camera(): Frame added to queue")
+                #logging.info("Camera(): Frame added to queue")
                 
                 stream.truncate(0)
 
                 self.ready = True
-
+                
+            sleep(self.framerate_ms)
     def stop(self):
         self.stopped = True
         if self.camera_type == USB:
@@ -113,7 +119,7 @@ class Camera():
         return self.ready
 
     def get_frame(self):
-        logging.info("Camera Queue: " + str(self.Q.qsize()))
+        #logging.info("Camera Queue: " + str(self.Q.qsize()))
         if not self.Q.empty():
             self.history = self.Q.get()
         return self.history

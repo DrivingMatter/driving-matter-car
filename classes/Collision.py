@@ -53,7 +53,7 @@ class Collision:
         return not self.Q.empty()
 
     def get(self):
-        logging.info("Collision Queue: " + str(self.Q.qsize()))
+        # logging.info("Collision Queue: " + str(self.Q.qsize()))
         if not self.Q.empty():
             self.history = self.Q.get() # TODO: handle empty value when exceptions called
         return self.history

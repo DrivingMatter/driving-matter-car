@@ -67,10 +67,15 @@ cameras = []
 if camera_settings:
     for key in camera_settings:
         c = camera_settings[key]
-        camera = Camera(c['camera_type'], c['camera_num'],
+        try:
+          camera = Camera(c['camera_type'], c['camera_num'],
                           c['resolution'], c['framerate'], c['rotation'])
-        camera.start() # Starting the camera
-        cameras.append((key, camera))        
+          camera.start() # Starting the camera, through exception if camera doesn't exists
+          cameras.append((key, camera))        
+        except Exception:
+          logging.debug(key + " camera doesn't exists, ignoring that camera")
+          # Ignore is camera doesn't exist. 
+          pass
 
 car = Car4W(tyres, sensors, cameras, timeframe)
 
@@ -87,5 +92,5 @@ if __name__ == "__main__":
         s = Server(h, port=port)
         s.start()
     except KeyboardInterrupt:
-        #rc.unregister_car()
+        rc.unregister_car()
         print "Exiting"
