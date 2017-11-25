@@ -42,7 +42,7 @@ class Camera():
         else:
             raise EnviormentError("Invalid camera type")
 
-        logging.debug("CameraOne.__init__()")
+        #logging.debug("CameraOne.__init__()")
 
     def start(self):
         if self.t:
@@ -67,7 +67,7 @@ class Camera():
             stream.seek(0)
 
             self.Q.put(stream.getvalue())
-            logging.info("Camera(): Frame added to queue")
+            #logging.info("Camera(): Frame added to queue")
 
             stream.truncate(0)
 
@@ -96,8 +96,7 @@ class Camera():
                     self.Q.get(0)
 
                 self.Q.put(stream.getvalue())
-                logging.info("Camera(): Frame added to queue")
-                
+                #logging.info("Camera(): Frame added to queue")
                 
                 stream.truncate(0)
 
@@ -120,7 +119,7 @@ class Camera():
         return self.ready
 
     def get_frame(self):
-        logging.info("Camera Queue: " + str(self.Q.qsize()))
+        #logging.info("Camera Queue: " + str(self.Q.qsize()))
         if not self.Q.empty():
             self.history = self.Q.get()
         return self.history

@@ -1,9 +1,9 @@
 {
 	"rps_ms": 200,
 	"__rps_ms": "Generate request every x milliseconds for State Websocket",
-	"timeframe": 0.1,
+	"timeframe": 0.3,
 	"port": 8000,
-	"car_speed": 25,
+	"car_speed": 50,
 	"sensor_settings": {
 		"ultrasonic_c": {
 			"echo": 27,

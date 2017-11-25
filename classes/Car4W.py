@@ -59,28 +59,32 @@ class Car4W:
         while True:
             if self.state in [State.FORWARD, State.FORWARD_LEFT, State.FORWARD_RIGHT]:
                 collision = self.collision.get()
-                logging.info("Ultrasonic Values: " + str(collision))
+                #logging.info("Ultrasonic Values: " + str(collision))
                 if collision.get("center") and self.state == State.FORWARD:
                     logging.debug("Center collision detected, stopping.")
                     self.take_action("stop")
-                if collision.get("left") and self.state == State.FORWARD_LEFT:
+                elif collision.get("left") and self.state == State.FORWARD_LEFT:
                     logging.debug("Left collision detected, stopping.")
                     self.take_action("stop")
-                if collision.get("right") and self.state == State.FORWARD_RIGHT:
+                elif collision.get("right") and self.state == State.FORWARD_RIGHT:
                     logging.debug("Right collision detected, stopping.")
                     self.take_action("stop")
+                else:
+                    self.take_action("idle")
             else:
                self.take_action("idle")
-            
+            print "auto_stop"
             sleep(self.timeframe)
 
     def set_timeframe(self, timeframe):
         self.timeframe = timeframe
 
     def is_idle(self):
-        return self.state == State.IDLE
+        print self.state.name
+        return self.state in (State.IDLE, State.STOPPED)
 
     def take_action(self, method_name):
+        print ("Taking action, " + method_name)
         self.action_id += 1 # This function is called from Websocket
         method = getattr(self, method_name)
         method()
@@ -96,7 +100,7 @@ class Car4W:
 
         # ADDING: Car state
         state['car_state'] = self.state.name # Put car state eg FOWARD, RIGHT, LEFT
-        state['car_action_id'] = self.car_action_id # Put car state eg FOWARD, RIGHT, LEFT
+        state['car_action_id'] = self.action_id # Put car state eg FOWARD, RIGHT, LEFT
 
         # ADDING: Sensors details
         sensors = self.collision.get()
@@ -108,7 +112,7 @@ class Car4W:
             frame = camera[1].get_frame()
             state[name] = frame
 
-        logging.debug("Received State in {} seconds".format(time.time() - start_time))
+        #logging.debug("Received State in {} seconds".format(time.time() - start_time))
         return state # converted to pickle in State.py
 
     def forward(self):
@@ -132,10 +136,7 @@ class Car4W:
 
     def idle(self):
         self.state = State.IDLE
-        self.frontLeft.stop()
-        self.frontRight.stop()
-        self.backLeft.stop()
-        self.backRight.stop()
+        self.stop()
 
     def stop(self):
         self.state = State.STOPPED
@@ -191,34 +192,34 @@ class Car4W:
         sleep(0.5)
         self.stop()
 
-        sleep(3)
+        sleep(1)
 
         self.backward()
         sleep(0.5)
         self.stop()
 
-        sleep(3)
+        sleep(1)
 
         self.forwardRight()
         sleep(0.5)
         self.stop()
 
-        sleep(3)
+        sleep(1)
 
         self.forwardLeft()
         sleep(0.5)
         self.stop()
 
-        sleep(3)
+        sleep(1)
 
         self.backwardLeft()
-        sleep(0.5)
+        sleep(3)
         self.stop()
 
-        sleep(3)
+        sleep(1)
 
         self.backwardRight()
-        sleep(0.5)
+        sleep(3)
         self.stop()
 
     def __del__():
