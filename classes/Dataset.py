@@ -2,16 +2,18 @@ import os
 import numpy as np
 from PIL import Image
 import pandas
-import cv2
 import time
-import datetime
 import csv
+import logging
+from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 class Dataset:
     def __init__(self, base = "dataset/", filename = "dataset.csv"):
         self.cwd = os.getcwd() + "/" 
         self.base = base
-        self.directory = self.base + str(time.time()) + "/"
+        self.directory = self.base + str(datetime.now()) + "/"
         self.csv_file_path = self.directory + filename
         self.images_path = self.directory + "images/"
 
