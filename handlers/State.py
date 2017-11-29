@@ -70,4 +70,4 @@ class State(tornado.websocket.WebSocketHandler):
         state = pickle.dumps(state)
         self.write_message(state, True)
     
-        print ("Total requests: " + str(self.total_requests) + "\t\t" + str(int(time())) )
+        # logging.debug("Total requests: " + str(self.total_requests) + "\t\t" + str(int(time())) )
