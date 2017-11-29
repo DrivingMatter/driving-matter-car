@@ -28,6 +28,7 @@ class Action(tornado.websocket.WebSocketHandler):
 
             # Wait until car is idle
             while not self.car.is_idle():
+                print("Waiting...")
                 sleep(0.01)
 
             logging.debug("Message => " + message)
