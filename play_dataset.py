@@ -4,6 +4,7 @@ from classes.Dataset import Dataset
 from classes.LoadCar import load_car
 from classes.KBhit import KBHit
 import logging
+from time import sleep
 logger = logging.getLogger("play.py")
 
 print "ACTIONS = " + str(ACTIONS)
@@ -35,6 +36,7 @@ try:
 		execute_action("forwardLeft")
             elif c == 4: # Space
 		execute_action("stop")
+	sleep(0.05)
 finally:
     driver.close()
     car.close()

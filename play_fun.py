@@ -11,7 +11,6 @@ print "ACTIONS = " + str(ACTIONS)
 
 car, rps_ms, port = load_car("config.json")
 driver = Driver(car, show_camera = True)
-dataset = Dataset()
 
 def execute_action(action):
     logger.debug("Action :" + action)
@@ -37,7 +36,7 @@ try:
         state = car.get_state_vector()
         driver.display_camera(state)
         
-        sleep(0.1)
+        sleep(0.05)
 finally:
     driver.close()
     car.close()

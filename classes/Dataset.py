@@ -45,7 +45,7 @@ class Dataset:
                 name = key + "_" + image_name
                 value = Image.open(io.BytesIO(value))
                 path = self.images_path + name
-                rel_path = images_rel_path + name
+                rel_path = self.images_rel_path + name
                 value.save(path)
                 datavector[key] = rel_path
                 

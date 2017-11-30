@@ -1,2 +1,0 @@
-state0_sensors,state0_camera_c,action,state1_sensors,state1_camera_c,time
-"{'right': False, 'center': False, 'left': False}",/home/pi/Desktop/driving-matter-car/dataset/2017-11-30 20:12:50.005501/images/state0_camera_c_1512072777.8.jpg,forwardLeft,"{'right': False, 'center': False, 'left': False}",/home/pi/Desktop/driving-matter-car/dataset/2017-11-30 20:12:50.005501/images/state1_camera_c_1512072777.8.jpg,2017-11-30 20:12:57.802234

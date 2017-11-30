@@ -105,7 +105,7 @@ class Camera():
         if self.camera_type == USB:
             self.camera.release()
         else:
-            self.camera.stop()
+            self.camera.close()
         self.t = None
 
     def more(self):
