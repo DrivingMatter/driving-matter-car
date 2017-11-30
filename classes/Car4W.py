@@ -11,14 +11,16 @@ import picamera
 import io
 import pickle
 import time
+import cv2
 
 logger = logging.getLogger(__name__)
 GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
 
 class Car4W:
     def __init__(self, tyres, sensors=[], cameras=[], timeframe=0.1):
         logger.debug("Car4W.__init__()")
-        
+
         self.action_id = 0
 
         self.t = None
@@ -34,16 +36,28 @@ class Car4W:
         self.backRight = tyres[2][1]
         self.backLeft = tyres[3][1]
 
+        self.stop()  # Stop the car, reset pins.
+
         self.collision = Collision(sensors)
         self.collision.start()
 
+        logger.debug("Waiting to collision sensor to get ready")
+        while not self.collision.ready:
+            sleep(0.5)
+        logger.info("Collision sensors are ready.")
+
+        logger.debug("Waiting to camera to get ready")
         self.cameras = cameras
         for camera in self.cameras:
             camera[1].start()
-
+            
+        for camera in self.cameras:
+            while not camera[1].ready:
+                sleep(0.5)
+            logger.debug(camera[0] + " is ready.")
+        logger.info("Cameras are ready.")
+        
         #Thread(target=self._auto_stop).start()
-
-        self.stop()  # Stop the car, reset pins.
 
     # def _auto_stop(self):
     #     # Using take_action because we want to update action_id
@@ -83,19 +97,19 @@ class Car4W:
     def get_state(self):
         return self.state
 
-    def get_state_vector(self):
+    def get_state_vector(self, latest=False):
         start_time = time.time()
 
         state = {}
-
+        
         # ADDING: Sensors details
-        sensors = self.collision.get()
+        sensors = self.collision.get(latest)
         state['sensors'] = sensors
         
         # ADDING: Camera data
         for camera in self.cameras:
-            name = "camera_" + camera[0]
-            frame = camera[1].get_frame()
+            name = camera[0]
+            frame = camera[1].get_frame(latest)
             state[name] = frame
 
         #logger.debug("Received State in {} seconds".format(time.time() - start_time))
@@ -136,8 +150,8 @@ class Car4W:
             self.frontLeft.forward()
             self.backLeft.forward()
 
-            self.frontRight.stop()
-            self.backRight.stop()
+            self.frontRight.backward()
+            self.backRight.backward()
             self.state = State.FORWARD_RIGHT
         else:
             self.stop()
@@ -148,8 +162,8 @@ class Car4W:
             self.frontRight.forward()
             self.backRight.forward()
 
-            self.frontLeft.stop()
-            self.backLeft.stop()
+            self.frontLeft.backward()
+            self.backLeft.backward()
             self.state = State.FORWARD_LEFT
         else:
             self.stop()
@@ -160,16 +174,22 @@ class Car4W:
         self.frontLeft.backward()
         self.backLeft.backward()
 
-        self.frontRight.stop()
-        self.backRight.stop()
+        self.frontRight.forward()
+        self.backRight.forward()
 
     def backwardLeft(self):
         self.state = State.BACKWARD_LEFT
         self.frontRight.backward()
         self.backRight.backward()
 
-        self.frontLeft.stop()
-        self.backLeft.stop()
+        self.frontLeft.forward()
+        self.backLeft.forward()
+
+    def close(self):
+        self.stop()
+        self.collision.stop()
+        for camera in self.cameras:
+            camera[1].stop()
 
     def test(self):
         from time import sleep

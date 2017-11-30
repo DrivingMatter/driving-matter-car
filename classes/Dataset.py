@@ -1,22 +1,22 @@
 import os
 import numpy as np
 from PIL import Image
-#import pandas
 import time
 import csv
 import logging
 from datetime import datetime
-
+from PIL import Image
+import io
 logger = logging.getLogger(__name__)
-
 
 class Dataset:
     def __init__(self, base="dataset/", filename="dataset.csv"):
         self.cwd = os.getcwd() + "/"
-        self.base = base
+        self.base = self.cwd + base
         self.directory = self.base + str(datetime.now()) + "/"
         self.csv_file_path = self.directory + filename
-        self.images_path = self.directory + "images/"
+        self.images_rel_path = "images/" # Relative path
+        self.images_path = self.directory + self.images_rel_path
 
         if not os.path.exists(self.images_path):
             os.makedirs(self.images_path)
@@ -39,14 +39,16 @@ class Dataset:
 
         for key in datavector:
             value = datavector[key]
-
+            
             # save images
-            if key.startswith("camera"):
-                name = key + image_name
-                path = self.images_path + "_" + name
-                print path
+            if "camera" in key:
+                name = key + "_" + image_name
+                value = Image.open(io.BytesIO(value))
+                path = self.images_path + name
+                rel_path = images_rel_path + name
                 value.save(path)
-                datavector[key] = path
+                datavector[key] = rel_path
+                
         self.add_data(datavector)
 
     def add_data(self, data):
@@ -55,5 +57,9 @@ class Dataset:
         self.csv_file_writer.flush()
 
     def get_dataset(self):
-        data = None#pandas.read_csv(self.csv_file_path)
+        data = None
         return data
+    
+    def close(self):
+        self.csv_file_writer.flush()
+        self.csv_file_writer.close()

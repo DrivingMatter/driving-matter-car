@@ -82,25 +82,19 @@ class KBHit:
 
     def carkey(self):
         ''' Returns an arrow-key code after kbhit() has been called. Codes are
-        0 : up
-        1 : right
-        2 : down
-        3 : left
+        0 : w
+        1 : d
+        2 : s
+        3 : a
+        4 : [SPACE]
         Should not be called in the same program as getch().
         '''
-
+        vals = ['w', 'd', 's', 'a', ' ']
         if os.name == 'nt':
-            o = msvcrt.getch() # skip 0xE0, handle space
-            if ord(o) == 32:
-                c = o
-            else:    
-                c = msvcrt.getch()
-            vals = [72, 77, 80, 75, 32]
+            c = msvcrt.getch() # skip 0xE0, handle space
         else:
-            c = sys.stdin.read(3)[2]
-            vals = [65, 67, 66, 68, 32]
+            c = sys.stdin.read(1)
 
-        c = ord(c)
         if c in vals:
             return vals.index(c)
         return -1
@@ -115,7 +109,7 @@ class KBHit:
             dr,dw,de = select([sys.stdin], [], [], 0)
             return dr != []
 
-"""
+
 if __name__ == "__main__":
 
     kb = KBHit()
@@ -123,14 +117,10 @@ if __name__ == "__main__":
     print('Hit any key, or ESC to exit')
     x=1 
     while True:
-        x+=1
-        print x
         if kb.kbhit():
             c = kb.getch()
-            if ord(c) == 27: # ESC
-                break
-            print(c)
-
+            print (ord(c))
+            # if ord(c) == 27: # ESC
+            #    break
 
     kb.set_normal_term()
-"""

@@ -65,9 +65,9 @@ class Camera():
                 return
 
             stream.seek(0)
-
+                
             self.Q.put(stream.getvalue())
-            #logging.info("Camera(): Frame added to queue")
+            # logging.info("Camera(): Frame added to queue")
 
             stream.truncate(0)
 
@@ -79,35 +79,31 @@ class Camera():
             if self.stopped:
                 return
 
-            if not self.Q.full():
-                (grabbed, frame) = self.camera.read()
+            (grabbed, frame) = self.camera.read()
 
-                if not grabbed:
-                    self.stop()
-                    return
+            if not grabbed:
+                self.stop()
+                return
 
-                frame = cv2.flip(frame, self.rotation)
-                img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-                img.save(stream, "JPEG")
+            frame = cv2.flip(frame, self.rotation)
+            img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            img.save(stream, "JPEG")
 
-                stream.seek(0)
-                
-                if self.Q.full():
-                    self.Q.get(0)
+            stream.seek(0)
 
-                self.Q.put(stream.getvalue())
-                #logging.info("Camera(): Frame added to queue")
-                
-                stream.truncate(0)
+            self.Q.put(stream.getvalue())
+            #logging.info("Camera(): Frame added to queue")
+            
+            stream.truncate(0)
 
-                self.ready = True
+            self.ready = True
                 
             sleep(self.framerate_ms)
+            
     def stop(self):
         self.stopped = True
         if self.camera_type == USB:
             self.camera.release()
-            cv2.destroyAllWindows()
         else:
             self.camera.stop()
         self.t = None
@@ -118,10 +114,17 @@ class Camera():
     def ready(self):
         return self.ready
 
-    def get_frame(self):
+    def get_frame(self, latest = False):
         #logging.info("Camera Queue: " + str(self.Q.qsize()))
-        if not self.Q.empty():
-            self.history = self.Q.get()
+        while latest:
+            logging.info("Camera Queue: " + str(self.Q.qsize()))
+            if not self.Q.empty():
+                self.history = self.Q.get()
+            else:
+                break
+        else:
+            if not self.Q.empty():
+                self.history = self.Q.get()        
         return self.history
 
     def clear_queue(self):

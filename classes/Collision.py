@@ -11,6 +11,7 @@ from threading import Thread
 import io
 from time import sleep
 import logging
+logger = logging.getLogger(__name__)
 
 class Collision:
     def __init__(self, sensors, queue_size=2):
@@ -26,7 +27,6 @@ class Collision:
             return
 
         self.t = Thread(target=self.update, args=())
-        #self.t.daemon = True
         self.t.start()
 
     def update(self):
@@ -38,8 +38,11 @@ class Collision:
             for sensor in self.sensors:
                 result[sensor[0]] = sensor[1].check_collision()
 
+            if self.Q.full():
+                self.Q.get()
+                
             self.Q.put(result)
-            #logging.info("Collision(): Info added to queue")
+            #logger.info("Collision(): Info added to queue")
 
             self.ready = True
 
@@ -52,10 +55,19 @@ class Collision:
     def more(self):
         return not self.Q.empty()
 
-    def get(self):
-        # logging.info("Collision Queue: " + str(self.Q.qsize()))
-        if not self.Q.empty():
-            self.history = self.Q.get() # TODO: handle empty value when exceptions called
+    def ready(self):
+        return self.ready
+
+    def get(self, latest = False):
+        # logger.info("Collision Queue: " + str(self.Q.qsize()))
+        while latest:
+            if not self.Q.empty():
+                self.history = self.Q.get()
+            else:
+                break
+        else:
+            if not self.Q.empty():
+                self.history = self.Q.get()        
         return self.history
         
     def clear_queue(self):
