@@ -5,6 +5,7 @@ from classes.UDSensor import CollisionSensor
 from classes.RegisterCar import RegisterCar
 
 import json
+import logging
 
 def load_car(config_file="config.json"):
     # Loading config file
