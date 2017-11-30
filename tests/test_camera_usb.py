@@ -20,13 +20,15 @@ while True:
     if c.ready and c.more():
         framerate += 1
         frame = c.get_frame()
-        stream = io.BytesIO()
-        stream.write(frame)
-        stream.seek(0)
-        img = Image.open(stream)
-        img = np.asarray(img)
-        cv2.imshow("camera_c", img)
-        stream.seek(0)
-        key = cv2.waitKey(1) & 0xFF
+        if frame is not None:
+            print "Frame is None"
+            stream = io.BytesIO()
+            stream.write(frame)
+            stream.seek(0)
+            img = Image.open(stream)
+            img = np.asarray(img)
+            cv2.imshow("camera_c", img)
+            stream.seek(0)
+            key = cv2.waitKey(1) & 0xFF
 
         print ("FPS: " + str(framerate / (time() - start)))

@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from PIL import Image
-import pandas
+#import pandas
 import time
 import csv
 import logging
@@ -9,9 +9,10 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
+
 class Dataset:
-    def __init__(self, base = "dataset/", filename = "dataset.csv"):
-        self.cwd = os.getcwd() + "/" 
+    def __init__(self, base="dataset/", filename="dataset.csv"):
+        self.cwd = os.getcwd() + "/"
         self.base = base
         self.directory = self.base + str(datetime.now()) + "/"
         self.csv_file_path = self.directory + filename
@@ -20,11 +21,11 @@ class Dataset:
         if not os.path.exists(self.images_path):
             os.makedirs(self.images_path)
 
-        if not os.path.exists(self.cwdself.csv_file_path):
+        if not os.path.exists(self.csv_file_path):
             with open(self.csv_file_path, 'wb') as newFile:
                 # file created.
                 pass
-                
+
         self.csv_file_writer = open(self.csv_file_path, 'ab')
         self.header = None
 
@@ -34,24 +35,25 @@ class Dataset:
             csv_writer = csv.writer(self.csv_file_writer)
             csv_writer.writerow(self.header)
 
-        image_name = str(time.time())+ ".jpg"
-        
+        image_name = str(time.time()) + ".jpg"
+
         for key in datavector:
             value = datavector[key]
-            # save images
-            if "camera" in key:
-                name = key + "_" + image_name
-                path = self.images_path + name
-                value.save(path)        
-                datavector[key] = path
 
+            # save images
+            if key.startswith("camera"):
+                name = key + image_name
+                path = self.images_path + "_" + name
+                print path
+                value.save(path)
+                datavector[key] = path
         self.add_data(datavector)
-    
+
     def add_data(self, data):
-       dict_writer = csv.DictWriter(self.csv_file_writer, self.header, -999)
-       dict_writer.writerow(data)
-       self.csv_file_writer.flush()
+        dict_writer = csv.DictWriter(self.csv_file_writer, self.header, -999)
+        dict_writer.writerow(data)
+        self.csv_file_writer.flush()
 
     def get_dataset(self):
-        data = pandas.read_csv(self.csv_file_path)
+        data = None#pandas.read_csv(self.csv_file_path)
         return data
