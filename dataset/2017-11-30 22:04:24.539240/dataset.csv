@@ -1,2 +1,0 @@
-state0_sensors,state0_camera_c,state0_camera_l,state0_camera_r,action,state1_sensors,state1_camera_c,state1_camera_l,state1_camera_r,time
-"{'right': False, 'center': True, 'left': False}",images/state0_camera_c_1512079468.47.jpg,images/state0_camera_l_1512079468.47.jpg,images/state0_camera_r_1512079468.47.jpg,stop,"{'right': False, 'center': True, 'left': False}",images/state1_camera_c_1512079468.47.jpg,images/state1_camera_l_1512079468.47.jpg,images/state1_camera_r_1512079468.47.jpg,2017-11-30 22:04:28.473773
