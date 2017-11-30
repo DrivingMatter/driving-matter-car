@@ -49,7 +49,7 @@ class Car4W:
         for camera in self.cameras:
             camera[1].start()
 
-        Thread(target=self._auto_stop).start()
+        #Thread(target=self._auto_stop).start()
 
         self.stop()  # Stop the car, reset pins.
 
@@ -213,14 +213,14 @@ class Car4W:
         sleep(1)
 
         self.backwardLeft()
-        sleep(3)
+        sleep(1)
         self.stop()
 
         sleep(1)
 
         self.backwardRight()
-        sleep(3)
+        sleep(1)
         self.stop()
 
-    def __del__():
+    def __del__(self):
         GPIO.cleanup()
