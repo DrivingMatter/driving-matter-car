@@ -10,8 +10,7 @@ import numpy as np
 import io
 from time import time
 
-c = Camera(USB, camera_num=1, resolution=(
-    320, 240), framerate=5, rotation=-1)
+c = Camera(USB, camera_num=1, resolution=(320, 240), framerate=5, rotation=-1)
 c.start()
 
 framerate = 0

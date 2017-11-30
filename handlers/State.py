@@ -69,5 +69,5 @@ class State(tornado.websocket.WebSocketHandler):
         state['car_rps'] = car_rps 
         state = pickle.dumps(state)
         self.write_message(state, True)
-    
+   
         #logging.debug("Total requests: " + str(self.total_requests) + "\t\t" + str(int(time())) )
