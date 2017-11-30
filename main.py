@@ -1,9 +1,11 @@
 import logging
 import signal
 import sys
+import socket
 
 from classes.Server import Server
 from classes.LoadCar import load_car
+from classes.RegisterCar import RegisterCar
 
 from handlers import Action, State
 
@@ -13,7 +15,7 @@ assert(sys.version_info.major == 2)
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-car = load_car("config.json")
+car, rps_ms, port = load_car("config.json")
 
 h = [
     (r"/action", Action.Action, {'car': car}),

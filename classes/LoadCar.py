@@ -56,4 +56,4 @@ def load_car(config_file="config.json"):
             # Ignore is camera doesn't exist. 
             pass
 
-    return Car4W(tyres, sensors, cameras, timeframe)
+    return Car4W(tyres, sensors, cameras, timeframe), rps_ms, port
