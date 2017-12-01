@@ -20,7 +20,7 @@ class Camera():
         self.camera = None
         self.camera_type = camera_type
         self.stopped = False
-        self.Q = Queue(maxsize=2)
+        self.Q = Queue(maxsize=framerate)
         self.t = None
         self.history = None
         self.rotation = rotation
@@ -65,6 +65,9 @@ class Camera():
                 return
 
             stream.seek(0)
+            
+            if self.Q.full():
+                self.Q.get()
                 
             self.Q.put(stream.getvalue())
             # logging.info("Camera(): Frame added to queue")
@@ -90,7 +93,10 @@ class Camera():
             img.save(stream, "JPEG")
 
             stream.seek(0)
-
+            
+            if self.Q.full():
+                self.Q.get()
+            
             self.Q.put(stream.getvalue())
             #logging.info("Camera(): Frame added to queue")
             

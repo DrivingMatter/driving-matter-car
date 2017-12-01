@@ -45,7 +45,7 @@ class Driver:
 		sleep(self.car.timeframe) # Wait for action to complete
                 
 		self.car.stop() # Stop the car
-                
+                #sleep(1)
                 state1 = self.car.get_state_vector(latest=True)
 		if self.show_camera:
                     print "State 1 Showing"
