@@ -2,6 +2,8 @@ from State import ACTIONS
 from datetime import datetime
 from time import sleep
 from PIL import Image
+import logging
+logger = logging.getLogger(__name__)
 
 import cv2
 import io
@@ -37,9 +39,10 @@ class Driver:
 		state0 = self.car.get_state_vector(latest=True)
 
 		if self.show_camera:
-                    print "State 0 Showing"
+                    logger.debug("State 0 Showing")
                     self.display_camera(state0)
-                print "Taking action"
+                    
+                logger.debug("Taking action")
 		self.car.take_action(action)
 
 		sleep(self.car.timeframe) # Wait for action to complete
@@ -48,7 +51,7 @@ class Driver:
                 #sleep(1)
                 state1 = self.car.get_state_vector(latest=True)
 		if self.show_camera:
-                    print "State 1 Showing"
+                    logger.debug("State 1 Showing")
                     self.display_camera(state1)
 
 		return state0, action, state1 		

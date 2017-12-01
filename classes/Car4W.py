@@ -116,16 +116,11 @@ class Car4W:
         return state # converted to pickle in State.py
 
     def forward(self):
-        # None mean sensor doesn't exists, False mean no collision
-        if self.collision.get().get("center") in (False, None):
-            self.state = State.FORWARD
-            self.frontLeft.forward()
-            self.frontRight.forward()
-            self.backLeft.forward()
-            self.backRight.forward()
-        else:
-            self.stop()
-            logger.debug("forward() => Center collision")
+        self.state = State.FORWARD
+        self.frontLeft.forward()
+        self.frontRight.forward()
+        self.backLeft.forward()
+        self.backRight.forward()
 
     def backward(self):
         self.state = State.BACKWARD
@@ -146,28 +141,20 @@ class Car4W:
         self.backRight.stop()
 
     def forwardRight(self):
-        if self.collision.get().get("right") in (False, None):
-            self.frontLeft.forward()
-            self.backLeft.forward()
+        self.frontLeft.forward()
+        self.backLeft.forward()
 
-            self.frontRight.backward()
-            self.backRight.backward()
-            self.state = State.FORWARD_RIGHT
-        else:
-            self.stop()
-            logger.debug("forwardRight() => Right collision")
+        self.frontRight.backward()
+        self.backRight.backward()
+        self.state = State.FORWARD_RIGHT
 
     def forwardLeft(self):
-        if self.collision.get().get("left") in (False, None):
-            self.frontRight.forward()
-            self.backRight.forward()
+        self.frontRight.forward()
+        self.backRight.forward()
 
-            self.frontLeft.backward()
-            self.backLeft.backward()
-            self.state = State.FORWARD_LEFT
-        else:
-            self.stop()
-            logger.debug("forwardLeft() => Left collision")
+        self.frontLeft.backward()
+        self.backLeft.backward()
+        self.state = State.FORWARD_LEFT
 
     def backwardRight(self):
         self.state = State.BACKWARD_RIGHT
