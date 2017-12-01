@@ -65,7 +65,7 @@ class Driver:
 			datavector[name] = state0[key]
 			datavector_title.append(name)
 
-		datavector['action'] = a
+		datavector['action'] = ACTIONS.index(a)
 		datavector_title.append('action')
 
 		for key in state1:

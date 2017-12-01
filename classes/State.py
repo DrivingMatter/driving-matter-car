@@ -1,6 +1,15 @@
 from enum import Enum
 
-ACTIONS = ('stop', 'forward', 'forwardRight', 'forwardLeft', 'backward', 'backRight', 'backwardLeft')
+ACTIONS = ('forward', 'forwardLeft', 'forwardRight', 'backward', 'backwardRight', 'backwardLeft', 'stop')
+ACTIONS_REVERSE = {
+    'forward'       : 'backward',
+    'forwardLeft'   : 'forwardRight',
+    'forwardRight'  : 'forwardLeft',
+    'backward'      : 'forward',
+    'backwardRight' : 'backwardLeft',
+    'backwardLeft'  : 'backwardRight',
+    'stop'          : 'stop'
+}
 
 class State (Enum):
     IDLE            = 0
