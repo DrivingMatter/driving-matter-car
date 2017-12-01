@@ -5,7 +5,7 @@ from classes.LoadCar import load_car
 from classes.KBhit import KBHit
 import logging
 from time import sleep
-logger = logging.getLogger("play.py")
+logger = logging.getLogger("play_dataset.py")
 
 print "ACTIONS = " + str(ACTIONS)
 

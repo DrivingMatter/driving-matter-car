@@ -11,6 +11,12 @@ ACTIONS_REVERSE = {
     'stop'          : 'stop'
 }
 
+COLLISIONS = {
+    'forward'       : 'center',
+    'forwardLeft'   : 'left',
+    'forwardRight'  : 'right',
+}
+
 class State (Enum):
     IDLE            = 0
     FORWARD         = 1

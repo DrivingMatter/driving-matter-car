@@ -1,3 +1,6 @@
+*.dat
+/dataset/*
+!/dataset/empty
 *.pyc
 *.log
 *.out
