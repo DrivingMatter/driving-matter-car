@@ -1,3 +1,6 @@
+import sys
+from os import path
+sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from classes.Driver import Driver
 from classes.State import ACTIONS
 from classes.Dataset import Dataset
@@ -8,14 +11,14 @@ from time import sleep
 import pickle
 logger = logging.getLogger("play_auto.py")
 
-print "ACTIONS = " + str(ACTIONS)
+logger.debug("ACTIONS = " + str(ACTIONS))
 
-car, rps_ms, port = load_car("config.json")
+car, rps_ms, port = load_car("../config.json")
 driver = Driver(car, show_camera = True)
 dataset = Dataset()
 
 try:
-    model_file = open('models/model.dat', 'rb')
+    model_file = open('../models/model.dat', 'rb')
     model = pickle.load(model_file)
     model_file.close()
     driver.action_auto(model)

@@ -1,3 +1,6 @@
+import sys
+from os import path
+sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from classes.Driver import Driver
 from classes.State import ACTIONS
 from classes.Dataset import Dataset
@@ -5,11 +8,11 @@ from classes.LoadCar import load_car
 from classes.KBhit import KBHit
 import logging
 from time import sleep
-logger = logging.getLogger("play.py")
+logger = logging.getLogger("play_fun.py")
 
-print "ACTIONS = " + str(ACTIONS)
+logger.debug("ACTIONS = " + str(ACTIONS))
 
-car, rps_ms, port = load_car("config.json")
+car, rps_ms, port = load_car("../config.json")
 driver = Driver(car, show_camera = True)
 
 def execute_action(action):
