@@ -16,13 +16,12 @@ logger.debug("ACTIONS = " + str(ACTIONS))
 car, rps_ms, port = load_car("../config.json")
 driver = Driver(car, show_camera = True)
 
-try:
-    model_file = open('../models/model.pickle', 'rb')
-    model = pickle.load(model_file)
-    model_file.close()
-    driver.action_auto(model)
-finally:
-    driver.close()
-    car.close()
-    dataset.close()
-    kb.set_normal_term()
+
+model_file = open('../models/model.pickle', 'rb')
+model = pickle.load(model_file)
+model_file.close()
+driver.action_auto(model)
+
+driver.close()
+car.close()
+kb.set_normal_term()
