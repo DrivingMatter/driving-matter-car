@@ -1,0 +1,188 @@
+# Fix play_auto collision fix
+
+import sys
+from os import path
+sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+from classes.Driver import Driver
+from classes.State import ACTIONS
+from classes.Dataset import Dataset
+from classes.LoadCar import load_car
+from classes.KBhit import KBHit
+import logging
+from time import sleep
+import random
+import gym
+import numpy as np
+from collections import deque
+from Queue import LifoQueue
+import pickle
+
+#from keras.models import Sequential
+#from keras.layers import Dense
+#from keras.optimizers import RMSprop
+
+logger = logging.getLogger("play_rl.py")
+logger.debug("ACTIONS = " + str(ACTIONS))
+
+class CarEnv:
+    def __init__(self, car, driver):
+    	self.driver = driver
+    	self.actions = ('forward', 'forwardRight', 'forwardLeft', 'backward')
+        self.car = car
+        self.cameras_size = 3 * 32 * 24
+        self.sensors_size = 3
+        self.state_size = self.cameras_size + self.sensors_size # 3 cameras + 3 sensors
+    	self.taken_actions = LifoQueue()
+        self.sensor_reward = 10
+
+    def reset(self):
+    	while not self.taken_actions.empty():
+    		action = self.taken_actions.get()
+    		self.take_action(action)
+    		sleep(self.car.timeframe)
+    	logger.debug("Env reset done")
+
+    def _process_image(self, image_bytes):
+		frame = io.BytesIO(image_bytes)
+		frame = Image.open(frame).convert(mode='L')
+		frame = np.asarray(frame)
+		frame = misc.imresize(frame, 10)
+		frame = frame.astype('float32')
+        frame /= 255
+		return frame
+
+    def get_state(self, latest=True):
+    	state = self.get_state_vector(latest)
+
+    	cl = self._process_image(state['camera_l'])
+    	cc = self._process_image(state['camera_c'])
+    	cr = self._process_image(state['camera_r'])
+  		cameras = [cl, cc, cr]
+
+  		sensors = state['sensors']
+  		sensors_list = [float(sensor) for sensor in sensors]
+
+  		state = cameras + sensors_list
+        state = np.array(state)
+        state = state.reshape(-1)
+
+    	return state, sensors
+
+    def take_step(self, action):
+    	self.car.take_action(action)
+		sleep(self.car.timeframe)
+
+    def step(self, action):
+    	self.take_action(action)
+    	self.taken_actions.put(action)
+
+    	state, sensors = self.get_state()
+
+        reward = 1
+
+        for sensor in sensors:
+            if sensor:
+                reward += sensor_reward
+
+        done = None # To be implement using OpenCV
+
+        info = None
+
+    	return state, reward, done, info
+
+EPISODES = 5000
+
+class DQNAgent:
+    def __init__(self, state_size, action_size, batch_size):
+    	self.batch_size = batch_size
+        self.state_size = state_size
+        self.action_size = action_size
+        self.memory = deque(maxlen=100000)
+        self.gamma = 0.9    # discount rate
+        self.epsilon = 1.0  # exploration rate
+        self.e_decay = .99
+        self.e_min = 0.05
+        self.learning_rate = 0.01
+        self.model = self._build_model()
+
+    def _build_model(self):
+        model = MLPClassifier(hidden_layer_sizes=(16), verbose=True, batch_size=self.batch_size, max_iter=1)
+        return model
+
+    def remember(self, state, action, reward, next_state, done):
+        self.memory.append((state, action, reward, next_state, done))
+
+    def act(self, state):
+        if np.random.rand() <= self.epsilon:
+            return random.randrange(self.action_size)
+        act_values = self.model.predict(state)
+        return np.argmax(act_values[0])  # returns action
+
+    def replay(self, batch_size):
+        batch_size = min(batch_size, len(self.memory))
+        minibatch = random.sample(self.memory, batch_size)
+        X = np.zeros((batch_size, self.state_size))
+        Y = np.zeros((batch_size, self.action_size))
+        for i in range(batch_size):
+            state, action, reward, next_state, done = minibatch[i]
+            target = self.model.predict(state)[0]
+            if done:
+                target[action] = reward
+            else:
+                target[action] = reward + self.gamma * np.amax(self.model.predict(next_state)[0])
+            X[i], Y[i] = state, target
+        self.model.fit(X, Y)
+
+        if self.epsilon > self.e_min:
+            self.epsilon *= self.e_decay
+
+    def load(self, name):
+        #self.model.load_weights(name)
+        input_file = open(name, 'rb')
+		self.model = pickle.load(input_file)
+		input_file.close()
+
+    def save(self, name):
+        #self.model.save_weights(name)
+    	output_file = open(name, 'wb')
+		pickle.dump(self.model, output_file)
+		output_file.close()
+
+if __name__ == "__main__":
+	car, rps_ms, port = load_car("../config.json")
+	driver = Driver(car, show_camera = True)
+
+    #env = gym.make('CartPole-v0')
+    env = CarEnv(car, driver)
+
+    action_size = len(actions) 
+
+    state_size = env.state_size
+    action_size = len(env.actions)
+    
+    agent = DQNAgent(state_size, action_size, 32)
+    # agent.load("../save/rl-model.pickle")
+
+    for e in range(EPISODES):
+        state, sensors = env.get_state()
+        state = np.reshape(state, [1, -1])
+
+        for time in range(1000):
+            action = agent.act(state)
+            next_state, reward, done, _ = env.step(action)
+            
+            reward = reward if not done else -10
+            
+            next_state = np.reshape(next_state, [1, -1])
+            
+            agent.remember(state, action, reward, next_state, done)
+
+            state = next_state
+
+            if done or time == 999:
+                print("episode: {}/{}, score: {}, e: {:.2}"
+                        .format(e, EPISODES, time, agent.epsilon))
+                break
+        agent.replay()
+        # if e % 10 == 0:
+            # agent.save("../save/rl-model.pickle")

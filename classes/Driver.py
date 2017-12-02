@@ -19,10 +19,10 @@ class Driver:
     def display_camera(self, datavector):
         camera_names = [key for key in datavector if key.startswith('camera')]
         for name in camera_names:
-                        if name not in self.cv2_window_name:
-                            self.cv2_window_name.append(name)
+                if name not in self.cv2_window_name:
+                    self.cv2_window_name.append(name)
 
-                        frame = datavector[name]
+                frame = datavector[name]
             img = Image.open(io.BytesIO(frame))
             cv2.imshow(name, np.asarray(img))
             cv2.waitKey(1)  # CV2 Devil - Don't dare to remove
@@ -70,10 +70,10 @@ class Driver:
         state0 = self.car.get_state_vector(latest=True)
 
         if self.show_camera:
-                    logger.debug("State 0 Showing")
-                    self.display_camera(state0)
-                    
-                logger.debug("Taking action")
+            logger.debug("State 0 Showing")
+            self.display_camera(state0)
+            
+        logger.debug("Taking action")
         self.car.take_action(action)
 
         sleep(self.car.timeframe) # Wait for action to complete
@@ -108,6 +108,6 @@ class Driver:
         datavector_title.append("time")
         return datavector, datavector_title
 
-        def close(self):
-            for window_name in self.cv2_window_name:
-                cv2.destroyWindow(window_name)
+    def close(self):
+        for window_name in self.cv2_window_name:
+            cv2.destroyWindow(window_name)

@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 class Dataset:
     def __init__(self, base="dataset/", filename="dataset.csv"):
+        self.frame_count = 1
         self.cwd = os.getcwd() + "/"
         self.base = self.cwd + base
         self.directory = self.base + str(datetime.now()) + "/"
@@ -35,14 +36,13 @@ class Dataset:
             csv_writer = csv.writer(self.csv_file_writer)
             csv_writer.writerow(self.header)
 
-        image_name = str(time.time()) + ".jpg"
-
         for key in datavector:
             value = datavector[key]
             
             # save images
             if "camera" in key:
-                name = key + "_" + image_name
+                name =  "img" + self.frame_count + ".jpg"
+                self.frame_count += 1
                 value = Image.open(io.BytesIO(value))
                 path = self.images_path + name
                 rel_path = self.images_rel_path + name
