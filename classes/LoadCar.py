@@ -51,6 +51,6 @@ def load_car(config_file="config.json"):
                         c['resolution'], c['framerate'], c['rotation'])
         camera.start() # Starting the camera, through exception if camera doesn't exists
         cameras.append((key, camera))        
-        logging.debug(key + " camera doesn't exists, ignoring that camera")
+        #logging.debug(key + " camera doesn't exists, ignoring that camera")
 
     return Car4W(tyres, sensors, cameras, timeframe), rps_ms, port

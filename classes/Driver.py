@@ -14,15 +14,16 @@ class Driver:
     def __init__(self, car, show_camera = False):
         self.show_camera = show_camera
         self.car = car
-                self.cv2_window_name = []
+        self.cv2_window_name = []
 
     def display_camera(self, datavector):
         camera_names = [key for key in datavector if key.startswith('camera')]
         for name in camera_names:
-                if name not in self.cv2_window_name:
-                    self.cv2_window_name.append(name)
 
-                frame = datavector[name]
+            if name not in self.cv2_window_name:
+                self.cv2_window_name.append(name)
+
+            frame = datavector[name]
             img = Image.open(io.BytesIO(frame))
             cv2.imshow(name, np.asarray(img))
             cv2.waitKey(1)  # CV2 Devil - Don't dare to remove
@@ -31,17 +32,23 @@ class Driver:
         while True:
             state = self.car.get_state_vector(latest=True)
             
-            collisions = self.car.collison.get()
+            collisions = self.car.collision.get()
 
             # Converting BytesIO (frame) to np.array where frame is in grayscale
             frame = io.BytesIO(state['camera_c'])
             frame = Image.open(frame).convert(mode='L')
-            frame = np.asarray(frame).astype('float32')
+            frame = np.asarray(frame)
+            frame = misc.imresize(frame, 10)
+            frame = frame.astype('float32')
             frame /= 255
-
+            frame = frame.reshape(1, frame.shape[0]*frame.shape[1])
             action = model.predict(frame) # we get a integer
+            print action
+            action = np.argmax(action, axis=1)[0]
+            print action
             action = ACTIONS[action]    # convert integer to function name eg forward, forwardLeft...
-            logger.debug("Predicted Action: " + ACTIONS[action])
+            print action
+            logger.debug("Predicted Action: " + action)
 
             can_take_action = True    
             for name in collisions:
@@ -55,7 +62,7 @@ class Driver:
                 sleep(self.car.timeframe) # Wait for action to complete
                     
             self.car.stop()
-
+            sleep(0.5)
 
     def action_nowait(self, action):
         if action not in ACTIONS:
@@ -72,18 +79,18 @@ class Driver:
         if self.show_camera:
             logger.debug("State 0 Showing")
             self.display_camera(state0)
-            
+
         logger.debug("Taking action")
         self.car.take_action(action)
 
         sleep(self.car.timeframe) # Wait for action to complete
                 
         self.car.stop() # Stop the car
-                #sleep(1)
-                state1 = self.car.get_state_vector(latest=True)
+        #sleep(1)
+        state1 = self.car.get_state_vector(latest=True)
         if self.show_camera:
-                    logger.debug("State 1 Showing")
-                    self.display_camera(state1)
+            logger.debug("State 1 Showing")
+            self.display_camera(state1)
 
         return state0, action, state1       
 
