@@ -1,3 +1,4 @@
+*.pickle
 *.dat
 /dataset/*
 !/dataset/empty
