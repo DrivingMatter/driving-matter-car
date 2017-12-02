@@ -2,6 +2,7 @@ from State import ACTIONS, COLLISIONS
 from datetime import datetime
 from time import sleep
 from PIL import Image
+from scipy import misc
 import logging
 logger = logging.getLogger(__name__)
 
@@ -44,7 +45,7 @@ class Driver:
 
             can_take_action = True    
             for name in collisions:
-                if collisions[name] == True && COLLISIONS[action] == name: 
+                if collisions[name] == True and COLLISIONS[action] == name:
                     can_take_action = False
                     logger.debug("Collision detected")
                     break
