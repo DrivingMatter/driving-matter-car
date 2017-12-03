@@ -32,7 +32,7 @@ class Driver:
         while True:
             state = self.car.get_state_vector(latest=True)
             
-            collisions = self.car.collision.get()
+            collisions = state['sensors']
 
             # Converting BytesIO (frame) to np.array where frame is in grayscale
             frame = io.BytesIO(state['camera_c'])
@@ -43,19 +43,21 @@ class Driver:
             frame /= 255
             frame = frame.reshape(1, frame.shape[0]*frame.shape[1])
             action = model.predict(frame) # we get a integer
-            print action
             action = np.argmax(action, axis=1)[0]
-            print action
             action = ACTIONS[action]    # convert integer to function name eg forward, forwardLeft...
-            print action
+            
             logger.debug("Predicted Action: " + action)
 
+            logger.debug("Collisions: " + collisions)        
             can_take_action = True    
+            
             for name in collisions:
                 if collisions[name] == True and COLLISIONS[action] == name:
                     can_take_action = False
                     logger.debug("Collision detected")
                     break
+
+            logger.debug("can_take_action: " + str(can_take_action))        
 
             if can_take_action:
                 self.car.take_action(action)
