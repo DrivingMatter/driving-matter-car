@@ -123,7 +123,7 @@ class Camera():
     def get_frame(self, latest = False):
         #logging.info("Camera Queue: " + str(self.Q.qsize()))
         while latest:
-            logging.info("Camera Queue: " + str(self.Q.qsize()))
+            #logging.info("Camera Queue: " + str(self.Q.qsize()))
             if not self.Q.empty():
                 self.history = self.Q.get()
             else:

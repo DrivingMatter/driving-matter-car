@@ -46,7 +46,7 @@ class Collision:
 
             self.ready = True
 
-            sleep(0.5) # Required by UD Sensor Hardware
+            sleep(2) # Required by UD Sensor Hardware
 
     def stop(self):
         self.stopped = True
