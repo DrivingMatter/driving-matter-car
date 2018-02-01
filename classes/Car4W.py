@@ -18,7 +18,7 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
 class Car4W:
-    def __init__(self, tyres, sensors=[], cameras=[], timeframe=0.1):
+    def __init__(self, tyres, sensors=[], cameras=[], timeframe=0.1, car_speed=50):
         logger.debug("Car4W.__init__()")
 
         self.action_id = 0
@@ -26,6 +26,7 @@ class Car4W:
         self.t = None
         self.camera = None
         self.timeframe = timeframe
+        self.car_speed = car_speed
 
         if len(tyres) != 4:
             raise EnvironmentError("Car4W required four tyres")
@@ -82,6 +83,17 @@ class Car4W:
     #         print "auto_stop"
     #         sleep(self.timeframe)
 
+    def speed(self, speedup=1.5):
+        percent = self.car_speed * speedup
+        
+        if percent > 100:
+            percent = 100
+        
+        self.frontRight.speed(percent)
+        self.frontLeft.speed(percent)
+        self.backRight.speed(percent)
+        self.backLeft.speed(percent)
+
     def set_timeframe(self, timeframe):
         self.timeframe = timeframe
 
@@ -116,6 +128,7 @@ class Car4W:
         return state # converted to pickle in State.py
 
     def forward(self):
+        self.speed(1)
         self.state = State.FORWARD
         self.frontLeft.forward()
         self.frontRight.forward()
@@ -123,6 +136,7 @@ class Car4W:
         self.backRight.forward()
 
     def backward(self):
+        self.speed(1)
         self.state = State.BACKWARD
         self.frontLeft.backward()
         self.frontRight.backward()
@@ -134,6 +148,7 @@ class Car4W:
         self.stop()
 
     def stop(self):
+        self.speed(1)
         self.state = State.STOPPED
         self.frontLeft.stop()
         self.frontRight.stop()
@@ -141,6 +156,7 @@ class Car4W:
         self.backRight.stop()
 
     def forwardRight(self):
+        self.speed(1.5)
         self.frontLeft.forward()
         self.backLeft.forward()
 
@@ -149,6 +165,7 @@ class Car4W:
         self.state = State.FORWARD_RIGHT
 
     def forwardLeft(self):
+        self.speed(1.5)
         self.frontRight.forward()
         self.backRight.forward()
 
@@ -157,6 +174,7 @@ class Car4W:
         self.state = State.FORWARD_LEFT
 
     def backwardRight(self):
+        self.speed(1.5)
         self.state = State.BACKWARD_RIGHT
         self.frontLeft.backward()
         self.backLeft.backward()
@@ -165,6 +183,7 @@ class Car4W:
         self.backRight.forward()
 
     def backwardLeft(self):
+        self.speed(1.5)
         self.state = State.BACKWARD_LEFT
         self.frontRight.backward()
         self.backRight.backward()

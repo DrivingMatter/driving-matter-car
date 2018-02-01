@@ -7,6 +7,7 @@ import logging
 from datetime import datetime
 from PIL import Image
 import io
+from scipy import misc
 logger = logging.getLogger(__name__)
 
 class Dataset:
@@ -37,16 +38,17 @@ class Dataset:
             csv_writer.writerow(self.header)
 
         for key in datavector:
-            value = datavector[key]
+            frame = datavector[key]
             
             # save images
             if "camera" in key:
-                name =  "img" + self.frame_count + ".jpg"
+                name =  "img" + str(self.frame_count) + ".jpg"
                 self.frame_count += 1
-                value = Image.open(io.BytesIO(value))
+                #value = Image.open(io.BytesIO(value))
                 path = self.images_path + name
                 rel_path = self.images_rel_path + name
-                value.save(path)
+                misc.imsave(path, frame)
+                #value.save(path)
                 datavector[key] = rel_path
                 
         self.add_data(datavector)

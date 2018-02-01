@@ -47,7 +47,7 @@
 			"camera_num": 0, 
 			"__comment_camera_num": "It is specific to USB (CAMERA), 0 mean default, 1 mean second camera and so on...",
 			"resolution": [320, 240], 
-			"framerate": 15, 
+			"framerate": 10, 
 			"rotation": 180
 		},
 		"camera_l": {
@@ -56,7 +56,7 @@
 			"camera_num": 1, 
 			"__comment_camera_num": "It is specific to USB (CAMERA), 0 mean default, 1 mean second camera and so on...",
 			"resolution": [320, 240], 
-			"framerate": 15, 
+			"framerate": 10, 
 			"rotation": -1
 		},
 		"camera_r": {
@@ -65,7 +65,7 @@
 			"camera_num": 0, 
 			"__comment_camera_num": "It is specific to USB (CAMERA), 0 mean default, 1 mean second camera and so on...",
 			"resolution": [320, 240], 
-			"framerate": 15, 
+			"framerate": 10, 
 			"rotation": -1
 		}
 	}

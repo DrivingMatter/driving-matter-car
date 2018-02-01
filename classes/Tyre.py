@@ -16,7 +16,7 @@ class Tyre:
 
         if pwmPin:
             self.pwmPin = pwmPin
-            self.pwm = GPIO.PWM(pwmPin, 100)
+            self.pwm = GPIO.PWM(pwmPin, 50) # 50 Hz
             self.pwm.start(defaultPwm)
             #print ("defaultPwn = " + str(defaultPwm))
             GPIO.output(pwmPin, GPIO.HIGH)
@@ -25,14 +25,14 @@ class Tyre:
         self.backwardPin = backwardPin
 
     def speed(self, percent=80):
-        self.pwm.stop()
-        GPIO.output(self.pwmPin, GPIO.LOW)
+        #self.pwm.stop()
+        #GPIO.output(self.pwmPin, GPIO.LOW)
 
-        self.pwm = GPIO.PWM(self.pwmPin, 100)
-        self.pwm.start(percent)
-        GPIO.output(self.pwmPin, GPIO.HIGH)
+        #self.pwm = GPIO.PWM(self.pwmPin, 100)
+        #self.pwm.start(percent)
+        #GPIO.output(self.pwmPin, GPIO.HIGH)
 
-        # self.pwm.ChangeDutyCycle(percent)
+        self.pwm.ChangeDutyCycle(percent)
 
     def forward(self):
         GPIO.output(self.forwardPin, GPIO.HIGH)

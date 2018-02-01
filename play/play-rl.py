@@ -53,11 +53,11 @@ class CarEnv:
             self.take_step(action)
         logger.debug("Env reset done")
 
-    def _process_image(self, image_bytes):
-        frame = io.BytesIO(image_bytes)
-        frame = Image.open(frame).convert(mode='L')
-        frame = np.asarray(frame)
-        frame = misc.imresize(frame, 10)
+    def _process_image(self, frame):
+        #frame = io.BytesIO(image_bytes)
+        #frame = Image.open(frame).convert(mode='L')
+        #frame = np.asarray(frame)
+        frame = misc.imresize(frame, 10) # TODO: convert to grayscale
         frame = frame.astype('float32')
         frame /= 255
         return frame

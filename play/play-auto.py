@@ -16,7 +16,6 @@ logger.debug("ACTIONS = " + str(ACTIONS))
 car, rps_ms, port = load_car("../config.json")
 driver = Driver(car, show_camera = True)
 
-
 model_file = open('../models/model.pickle', 'rb')
 model = pickle.load(model_file)
 model_file.close()

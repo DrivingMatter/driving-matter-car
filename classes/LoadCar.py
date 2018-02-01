@@ -53,4 +53,4 @@ def load_car(config_file="config.json"):
         cameras.append((key, camera))        
         #logging.debug(key + " camera doesn't exists, ignoring that camera")
 
-    return Car4W(tyres, sensors, cameras, timeframe), rps_ms, port
+    return Car4W(tyres, sensors, cameras, timeframe, car_speed), rps_ms, port

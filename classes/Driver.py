@@ -24,8 +24,7 @@ class Driver:
                 self.cv2_window_name.append(name)
 
             frame = datavector[name]
-            img = Image.open(io.BytesIO(frame))
-            cv2.imshow(name, np.asarray(img))
+            cv2.imshow(name, frame)
             cv2.waitKey(1)  # CV2 Devil - Don't dare to remove
         
     def action_auto(self, model):
@@ -34,10 +33,7 @@ class Driver:
             
             collisions = state['sensors']
 
-            # Converting BytesIO (frame) to np.array where frame is in grayscale
-            frame = io.BytesIO(state['camera_c'])
-            frame = Image.open(frame).convert(mode='L')
-            frame = np.asarray(frame)
+            frame = state['camera_c']
             frame = misc.imresize(frame, 10)
             frame = frame.astype('float32')
             frame /= 255
