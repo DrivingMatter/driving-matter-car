@@ -64,6 +64,7 @@ class Camera():
             self.camera = cv2.VideoCapture(camera_num)
             self.camera.set(3, w)
             self.camera.set(4, h)
+            self.camera.set(cv2.cv.CV_CAP_PROP_FPS, framerate)
         else:
             raise EnviormentError("Invalid camera type")
 
@@ -124,7 +125,7 @@ class Camera():
             
             self.ready = True
                 
-            sleep(self.framerate_ms)
+            #sleep(self.framerate_ms)
             
     def stop(self):
         self.stopped = True
