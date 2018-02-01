@@ -38,7 +38,7 @@ c.start()
 print ("Started...")
 while True:
     print (str(c.get()) + '    ' + str(time()))
-    sleep(0.01)
+    sleep(0.5)
     #print("Collison:")
     #print (s.check_collision())
 

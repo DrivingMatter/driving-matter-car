@@ -6,7 +6,7 @@ GPIO.setmode(GPIO.BCM)
 
 
 class CollisionSensor:
-    collision_thresh_hold = 20
+    collision_thresh_hold = 15
 
     def __init__(self, echo, trigger, max_distance=1):
         self.echo = echo
