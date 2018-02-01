@@ -48,7 +48,7 @@ class Driver:
             
             logger.debug("Predicted Action: " + action)
 
-            logger.debug("Collisions: " + collisions)        
+            #logger.debug("Collisions: " + collisions)        
             can_take_action = True    
             
             for name in collisions:
@@ -64,7 +64,6 @@ class Driver:
                 sleep(self.car.timeframe) # Wait for action to complete
                     
             self.car.stop()
-            sleep(0.5)
 
     def action_nowait(self, action):
         if action not in ACTIONS:

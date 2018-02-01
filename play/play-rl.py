@@ -213,7 +213,7 @@ if __name__ == "__main__":
                 print("episode: {}/{}, score: {}, e: {:.2}"
                         .format(e, EPISODES, time, agent.epsilon))
                 break
-        env.reset()
+        #env.reset()
         agent.replay()
         # if e % 10 == 0:
             # agent.save("../save/rl-model.dat")

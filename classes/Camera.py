@@ -1,4 +1,5 @@
 import picamera
+from picamera.array import PiRGBArray
 import logging
 import sys
 from PIL import Image
@@ -10,6 +11,7 @@ else:
 from threading import Thread
 import io
 from time import sleep
+import numpy as np
 
 PICAMERA = 0
 USB = 1
@@ -20,20 +22,43 @@ class Camera():
         self.camera = None
         self.camera_type = camera_type
         self.stopped = False
-        self.Q = Queue(maxsize=framerate)
+        self.Q = Queue(maxsize=2*framerate)
         self.t = None
         self.history = None
         self.rotation = rotation
+        self.resolution = resolution
         
         self.framerate_ms = 1.0/float(framerate)
 
         if self.camera_type == PICAMERA:
             self.camera = picamera.PiCamera()
-            self.camera.resolution = resolution
             if rotation:
-                self.camera.rotation = rotation
-                
+                self.camera.rotation = rotation    
+            self.camera.resolution = resolution
             self.camera.framerate = framerate
+            self.camera.sharpness = 0
+            self.camera.contrast = 0
+            self.camera.brightness = 65
+            self.camera.saturation = 0
+            self.camera.ISO = 0
+            self.camera.video_stabilization = True
+            self.camera.exposure_compensation = 0
+            self.camera.exposure_mode = 'auto'
+            self.camera.meter_mode = 'average'
+            self.camera.awb_mode = 'auto'
+            self.camera.image_effect = 'none'
+            self.camera.color_effects = None
+                        
+            #sleep(2)
+            
+            #while self.camera.analog_gain < 1 or  self.camera.digital_gain < 1:
+            #    sleep(0.1)
+                
+            #self.camera.exposure_mode = 'off'
+            
+            #if self.camera.analog_gain < 1 or  self.camera.digital_gain < 1:
+            #    raise RuntimeError('low gains')
+            
         elif self.camera_type == USB:
             w, h = resolution
             self.camera = cv2.VideoCapture(camera_num)
@@ -59,25 +84,26 @@ class Camera():
         self.t.start()
 
     def update_picamera(self):
-        stream = io.BytesIO()
-        for frame in self.camera.capture_continuous(stream, format="jpeg", use_video_port=True):
+        stream = PiRGBArray(self.camera)
+        image = self.camera.capture_continuous(stream, format="bgr", use_video_port=True)
+            
+        while True:
             if self.stopped:
                 return
 
-            stream.seek(0)
+            frame = image.next()
+            frame = frame.array
+            stream.truncate(0)
             
             if self.Q.full():
                 self.Q.get()
                 
-            self.Q.put(stream.getvalue())
+            self.Q.put(frame)
             # logging.info("Camera(): Frame added to queue")
-
-            stream.truncate(0)
 
             self.ready = True
 
     def update_usb(self):
-        stream = io.BytesIO()
         while True:
             if self.stopped:
                 return
@@ -89,19 +115,13 @@ class Camera():
                 return
 
             frame = cv2.flip(frame, self.rotation)
-            img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-            img.save(stream, "JPEG")
-
-            stream.seek(0)
             
             if self.Q.full():
                 self.Q.get()
             
-            self.Q.put(stream.getvalue())
+            self.Q.put(frame)
             #logging.info("Camera(): Frame added to queue")
             
-            stream.truncate(0)
-
             self.ready = True
                 
             sleep(self.framerate_ms)
