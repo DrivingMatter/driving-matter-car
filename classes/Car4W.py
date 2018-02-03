@@ -12,6 +12,7 @@ import io
 import pickle
 import time
 import cv2
+import base64
 
 logger = logging.getLogger(__name__)
 GPIO.setmode(GPIO.BCM)
@@ -109,7 +110,7 @@ class Car4W:
     def get_state(self):
         return self.state
 
-    def get_state_vector(self, latest=False):
+    def get_state_vector(self, latest=False, for_network=False): # for_network convert numpy to list because it is faster for pickle
         start_time = time.time()
 
         state = {}
@@ -122,6 +123,10 @@ class Car4W:
         for camera in self.cameras:
             name = camera[0]
             frame = camera[1].get_frame(latest)
+
+            if for_network == True:
+                frame = [str(frame.dtype), base64.b64encode(frame).decode("utf-8"), frame.shape]
+                
             state[name] = frame
 
         #logger.debug("Received State in {} seconds".format(time.time() - start_time))

@@ -10,7 +10,7 @@ import tornado.websocket
 from tornado.ioloop import PeriodicCallback
 from time import sleep
 import io
-import pickle
+import cPickle as pickle
 from time import time
 import logging
     
@@ -65,9 +65,9 @@ class State(tornado.websocket.WebSocketHandler):
         car_rps = self.timer[0]
         #logging.debug("RPS: " + str(car_rps))
     
-        state = self.car.get_state_vector()
+        state = self.car.get_state_vector(latest=True, for_network=True)
         state['car_rps'] = car_rps 
-        state = pickle.dumps(state)
+        #state = pickle.dumps(state)
         self.write_message(state, True)
    
         #logging.debug("Total requests: " + str(self.total_requests) + "\t\t" + str(int(time())) )

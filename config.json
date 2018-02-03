@@ -1,5 +1,5 @@
 {
-	"rps_ms": 200,
+	"rps_ms": 150,
 	"__rps_ms": "Generate request every x milliseconds for State Websocket",
 	"timeframe": 0.2,
 	"port": 8000,
