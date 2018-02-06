@@ -47,7 +47,7 @@ class State(tornado.websocket.WebSocketHandler):
             elif message == "stop_read_state":
                 self.inf_loop.stop()
         except tornado.websocket.WebSocketClosedError:
-            #logging.debug("State WS closed, stopping PeriodicCallback")
+            logging.debug("State WS closed, stopping PeriodicCallback")
             self.inf_loop.stop()
 
     def loop(self):    
@@ -68,6 +68,9 @@ class State(tornado.websocket.WebSocketHandler):
         state = self.car.get_state_vector(latest=True, for_network=True)
         state['car_rps'] = car_rps 
         #state = pickle.dumps(state)
-        self.write_message(state, True)
-   
+        try:
+            self.write_message(state, True)
+        except tornado.websocket.WebSocketClosedError:
+            logging.debug("State WS closed, stopping PeriodicCallback")
+            self.inf_loop.stop()
         #logging.debug("Total requests: " + str(self.total_requests) + "\t\t" + str(int(time())) )

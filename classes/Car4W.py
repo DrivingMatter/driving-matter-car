@@ -13,6 +13,9 @@ import pickle
 import time
 import cv2
 import base64
+import cStringIO
+from PIL import Image
+import numpy as np
 
 logger = logging.getLogger(__name__)
 GPIO.setmode(GPIO.BCM)
@@ -125,8 +128,13 @@ class Car4W:
             frame = camera[1].get_frame(latest)
 
             if for_network == True:
-                frame = [str(frame.dtype), base64.b64encode(frame).decode("utf-8"), frame.shape]
-                
+                stream = cStringIO.StringIO()
+                frame = frame[:,:,::-1]
+                #frame = np.roll(frame, 1, axis=-1) # BGR to RGB
+                frame = Image.fromarray(frame, 'RGB')
+                frame.save(stream, format="JPEG")
+                frame = base64.b64encode(stream.getvalue()).decode("utf-8")
+
             state[name] = frame
 
         #logger.debug("Received State in {} seconds".format(time.time() - start_time))
