@@ -1,3 +1,4 @@
+from SignDetection import SignDetection
 from State import ACTIONS, COLLISIONS
 from datetime import datetime
 from time import sleep
@@ -15,7 +16,22 @@ class Driver:
         self.show_camera = show_camera
         self.car = car
         self.cv2_window_name = []
+        
+    def detect_sign(self, datavector):
+        
+        sign_detection= SignDetection()
+        camera_names = [key for key in datavector if key.startswith('camera')]
+        for name in camera_names:
 
+            if name not in self.cv2_window_name:
+                self.cv2_window_name.append(name)
+
+            frame = datavector[name]
+            frame = sign_detection.detect(frame)
+            
+            cv2.imshow(name, frame)
+            cv2.waitKey(1)  # CV2 Devil - Don't dare to remove
+            
     def display_camera(self, datavector):
         camera_names = [key for key in datavector if key.startswith('camera')]
         for name in camera_names:
