@@ -128,6 +128,8 @@ class Car4W:
             frame = camera[1].get_frame(latest)
 
             if for_network == True:
+                # Sending NumPy 
+                #frame = [str(frame.dtype), base64.b64encode(frame).decode("utf-8"), frame.shape]
                 stream = cStringIO.StringIO()
                 frame = frame[:,:,::-1]
                 #frame = np.roll(frame, 1, axis=-1) # BGR to RGB
