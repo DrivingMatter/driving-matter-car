@@ -6,6 +6,7 @@ import numpy as np
 import math
 import threading
 from threading import Thread
+import timeit
 
 class SignDetection:
 
@@ -73,8 +74,8 @@ class SignDetection:
     def detect(self,image):
         self.image=image
         sign={}
-                     
-        sign['Traffic light']= cv2.CascadeClassifier("../classifiers/trafficlight_LBP_classifier.xml")
+                #  some of these classifier are trained on LBP features for testing purpose so they may have increased falseAlarmrate   
+        #sign['Traffic light']= cv2.CascadeClassifier("../classifiers/cascadelbptrafficnew.xml")
         sign['Stop']= cv2.CascadeClassifier("../classifiers/stopsign_classifier.xml")
         sign['No Left'] = cv2.CascadeClassifier("../classifiers/noleftturn_classifier.xml")
         

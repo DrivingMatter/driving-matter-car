@@ -5,11 +5,15 @@ from time import sleep
 from PIL import Image
 from scipy import misc
 import logging
+import time
 logger = logging.getLogger(__name__)
 
 import cv2
 import io
 import numpy as np
+
+def rgb2gray(rgb):
+    return np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
 
 class Driver:
     def __init__(self, car, show_camera = False):
@@ -18,7 +22,7 @@ class Driver:
         self.cv2_window_name = []
         
     def detect_sign(self, datavector):
-        
+        i=0
         sign_detection= SignDetection()
         camera_names = [key for key in datavector if key.startswith('camera')]
         for name in camera_names:
@@ -28,7 +32,6 @@ class Driver:
 
             frame = datavector[name]
             frame = sign_detection.detect(frame)
-            
             cv2.imshow(name, frame)
             cv2.waitKey(1)  # CV2 Devil - Don't dare to remove
             
@@ -44,16 +47,26 @@ class Driver:
             cv2.waitKey(1)  # CV2 Devil - Don't dare to remove
         
     def action_auto(self, model):
+        logger.debug("Driver::action_auto()")
         while True:
             state = self.car.get_state_vector(latest=True)
-            
+            logger.debug("Collected state")
+
             collisions = state['sensors']
 
-            frame = state['camera_c']
-            frame = misc.imresize(frame, 10)
+
+            frame = np.hstack([state['camera_l'], state['camera_c'], state['camera_r']])
+            print (frame.shape)
+
+            frame = misc.imresize(frame, (32, 96))
+            frame = rgb2gray(frame)
             frame = frame.astype('float32')
             frame /= 255
-            frame = frame.reshape(1, frame.shape[0]*frame.shape[1])
+
+            print (frame.shape)
+            frame = frame.reshape(1, 1, frame.shape[0], frame.shape[1])
+            print (frame.shape)
+            
             action = model.predict(frame) # we get a integer
             action = np.argmax(action, axis=1)[0]
             action = ACTIONS[action]    # convert integer to function name eg forward, forwardLeft...
