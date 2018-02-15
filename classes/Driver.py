@@ -5,12 +5,16 @@ from time import sleep
 from PIL import Image
 from scipy import misc
 import logging
+import time
 logger = logging.getLogger(__name__)
 from skimage import color
 import cv2
 import io
 import numpy as np
 import time
+
+def rgb2gray(rgb):
+    return np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
 
 class Driver:
     def __init__(self, car, show_camera = False):
@@ -28,7 +32,11 @@ class Driver:
                 self.cv2_window_name.append(name)
 
             frame = datavector[name]
+            width, height, channel = frame.shape
+            frame=cv2.resize(frame,(int(width),int(height/2)),interpolation=cv2.INTER_AREA)
             frame = sign_detection.detect(frame)
+            #frame=cv2.resize(frame,(int(width),int(height*2)),interpolation=cv2.INTER_AREA)
+            print(time.time())
             
             cv2.imshow(name, frame)
             cv2.waitKey(1)  # CV2 Devil - Don't dare to remove
@@ -45,6 +53,7 @@ class Driver:
             cv2.waitKey(1)  # CV2 Devil - Don't dare to remove
         
     def action_auto(self, model):
+        logger.debug("Driver::action_auto()")
         while True:
             logger.debug("Collecting dataset" + str(time.time()))
             state = self.car.get_state_vector(latest=True)
@@ -57,7 +66,6 @@ class Driver:
             
             frame = color.rgb2gray(frame)
             print ("Converted " + str(time.time()))
-
             
             if self.show_camera:
                 cv2.imshow("Image", frame)
@@ -66,13 +74,22 @@ class Driver:
             print ("Showing"  + str(time.time()))
             frame = misc.imresize(frame, 10)
             print ("Resized"  + str(time.time()))
+            logger.debug("Collected state")
+
+            collisions = state['sensors']
+
+
+            frame = np.hstack([state['camera_l'], state['camera_c'], state['camera_r']])
+            print (frame.shape)
+
+            frame = misc.imresize(frame, (32, 96))
+            frame = rgb2gray(frame)
             frame = frame.astype('float32')
             print ("done type " + str(time.time()))
             frame /= 255
             print ("done dvision "  + str(time.time()))
             frame = frame.reshape(1, 1, frame.shape[0], frame.shape[1])
             print ("preprocessing done"  + str(time.time()))
-
             action = model.predict(frame) # we get a integer
             action = np.argmax(action, axis=1)[0]
             action = ACTIONS[action]    # convert integer to function name eg forward, forwardLeft...
