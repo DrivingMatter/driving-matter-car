@@ -138,7 +138,6 @@ class Car4W:
                 frame = base64.b64encode(stream.getvalue()).decode("utf-8")
 
             state[name] = frame
-
         #logger.debug("Received State in {} seconds".format(time.time() - start_time))
         return state # converted to pickle in State.py
 

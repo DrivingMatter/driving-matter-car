@@ -50,6 +50,10 @@ class State(tornado.websocket.WebSocketHandler):
             logging.debug("State WS closed, stopping PeriodicCallback")
             self.inf_loop.stop()
 
+    def on_close(self):
+        self.inf_loop.stop()
+        logging.debug("WebSocket closed")
+
     def loop(self):    
         self.timer[self.timer_index] += 1
         self.total_requests += 1
@@ -63,7 +67,8 @@ class State(tornado.websocket.WebSocketHandler):
             self.timer[1] = 0
 
         car_rps = self.timer[0]
-        #logging.debug("RPS: " + str(car_rps))
+        logging.debug("RPS: " + str(car_rps))
+        state = {}
         state = self.car.get_state_vector(latest=True, for_network=True)
         state['car_rps'] = car_rps
         try:

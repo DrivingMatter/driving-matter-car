@@ -62,8 +62,8 @@ class Camera():
         elif self.camera_type == USB:
             w, h = resolution
             self.camera = cv2.VideoCapture(camera_num)
-            self.camera.set(3, w)
-            self.camera.set(4, h)
+            self.camera.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, w)
+            self.camera.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, h)
             self.camera.set(cv2.cv.CV_CAP_PROP_FPS, framerate)
         else:
             raise EnviormentError("Invalid camera type")
@@ -115,7 +115,7 @@ class Camera():
                 self.stop()
                 return
 
-            frame = cv2.flip(frame, self.rotation)
+            #frame = cv2.flip(frame, self.rotation)
             
             if self.Q.full():
                 self.Q.get()
@@ -125,7 +125,7 @@ class Camera():
             
             self.ready = True
                 
-            #sleep(self.framerate_ms)
+            sleep(self.framerate_ms)
             
     def stop(self):
         self.stopped = True
@@ -142,17 +142,29 @@ class Camera():
         return self.ready
 
     def get_frame(self, latest = False):
-        #logging.info("Camera Queue: " + str(self.Q.qsize()))
-        while latest:
-            #logging.info("Camera Queue: " + str(self.Q.qsize()))
-            if not self.Q.empty():
+        #print ("Here1")
+        if latest and not self.Q.empty():
+            size = self.Q.qsize()
+            #print ("Here2    size=" + str(size))
+            for i in range(size):
                 self.history = self.Q.get()
-            else:
-                break
+            #print ("Here3")
+            return self.history
         else:
-            if not self.Q.empty():
-                self.history = self.Q.get()        
-        return self.history
+            #print ("Here4")
+            return self.Q.get(timeout=30)
+
+        #logging.info("Camera Queue: " + str(self.Q.qsize()))
+        # while latest:
+        #     #logging.info("Camera Queue: " + str(self.Q.qsize()))
+        #     if not self.Q.empty() and history == False:
+        #         self.history = self.Q.get()
+        #     else:
+        #         break
+        # else:
+        #     if not self.Q.empty():
+        #         self.history = self.Q.get()        
+        # return self.history
 
     def clear_queue(self):
         self.Q.clear()

@@ -13,7 +13,6 @@ from time import time
 c = Camera(USB, camera_num=0, resolution=(320, 240), framerate=15, rotation=-1)
 c.start()
 
-
 framerate = [0, 0]
 start = time()
 while True:
@@ -23,7 +22,7 @@ while True:
         
         frame = c.get_frame()
         if frame is not None:
-            cv2.imshow("camera_c", frame)
+            cv2.imshow("camera_l", frame)
             #stream.seek(0)
             key = cv2.waitKey(1) & 0xFF
 

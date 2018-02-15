@@ -7,7 +7,7 @@ from classes.Dataset import Dataset
 from classes.LoadCar import load_car
 from classes.KBhit import KBHit
 import logging
-from time import sleep
+from time import sleep, time
 logger = logging.getLogger("play_dataset.py")
 
 print "ACTIONS = " + str(ACTIONS)
@@ -17,12 +17,13 @@ driver = Driver(car, show_camera = True)
 dataset = Dataset()
 
 def execute_action(action):
-    logger.debug("Action :" + action)
+    print ("="*80)
+    logger.debug(str(time()) + ": Action " + action)
     state0, action, state1 = driver.action_blocking(action)
-    logger.debug("Action executed")
+    logger.debug(str(time()) + ": Action executed")
     datavector, datavector_title = driver.process_dataset_vector(state0, action, state1)
     dataset.save_data(datavector, datavector_title)
-    logger.debug("dataset saved")
+    logger.debug(str(time()) + ": dataset saved")
 
 try:
     kb = KBHit()

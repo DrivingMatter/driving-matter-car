@@ -1,0 +1,5 @@
+state0_sensors,state0_camera_c,state0_camera_l,state0_camera_r,action,state1_sensors,state1_camera_c,state1_camera_l,state1_camera_r,time
+"{'right': False, 'center': False, 'left': False}",images/img5.jpg,images/img1.jpg,images/img6.jpg,0,"{'right': False, 'center': False, 'left': False}",images/img4.jpg,images/img2.jpg,images/img3.jpg,2018-02-14 04:50:46.995428
+"{'right': False, 'center': False, 'left': False}",images/img11.jpg,images/img7.jpg,images/img12.jpg,0,"{'right': False, 'center': False, 'left': False}",images/img10.jpg,images/img8.jpg,images/img9.jpg,2018-02-14 04:51:14.833330
+"{'right': False, 'center': False, 'left': False}",images/img17.jpg,images/img13.jpg,images/img18.jpg,0,"{'right': False, 'center': False, 'left': False}",images/img16.jpg,images/img14.jpg,images/img15.jpg,2018-02-14 04:51:45.675559
+"{'right': False, 'center': False, 'left': False}",images/img23.jpg,images/img19.jpg,images/img24.jpg,0,"{'right': False, 'center': False, 'left': False}",images/img22.jpg,images/img20.jpg,images/img21.jpg,2018-02-14 04:52:31.758493

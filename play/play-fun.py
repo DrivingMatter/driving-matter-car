@@ -13,11 +13,10 @@ logger = logging.getLogger("play_fun.py")
 logger.debug("ACTIONS = " + str(ACTIONS))
 
 car, rps_ms, port = load_car("../config.json")
-driver = Driver(car, show_camera = True)
+#driver = Driver(car, show_camera = False)
 
 def execute_action(action):
     logger.debug("Action :" + action)
-    print driver
     driver.action_nowait(action)
 
 try:
@@ -43,5 +42,4 @@ try:
 finally:
     driver.close()
     car.close()
-    dataset.close()
     kb.set_normal_term()

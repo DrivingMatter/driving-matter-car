@@ -15,7 +15,7 @@ assert(sys.version_info.major == 2)
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-car, rps_ms, port = load_car("config.json")
+car, rps_ms, port = load_car("config-auto.json")
 
 h = [
     (r"/action", Action.Action, {'car': car}),

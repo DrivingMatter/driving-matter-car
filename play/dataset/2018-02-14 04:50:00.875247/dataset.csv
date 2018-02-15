@@ -1,0 +1,3 @@
+state0_sensors,state0_camera_c,state0_camera_l,state0_camera_r,action,state1_sensors,state1_camera_c,state1_camera_l,state1_camera_r,time
+"{'right': False, 'center': False, 'left': False}",images/img5.jpg,images/img1.jpg,images/img6.jpg,0,"{'right': False, 'center': False, 'left': False}",images/img4.jpg,images/img2.jpg,images/img3.jpg,2018-02-14 04:50:17.100320
+"{'right': False, 'center': False, 'left': False}",images/img11.jpg,images/img7.jpg,images/img12.jpg,0,"{'right': False, 'center': False, 'left': False}",images/img10.jpg,images/img8.jpg,images/img9.jpg,2018-02-14 04:50:23.749297

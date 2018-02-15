@@ -6,10 +6,11 @@ from PIL import Image
 from scipy import misc
 import logging
 logger = logging.getLogger(__name__)
-
+from skimage import color
 import cv2
 import io
 import numpy as np
+import time
 
 class Driver:
     def __init__(self, car, show_camera = False):
@@ -45,37 +46,61 @@ class Driver:
         
     def action_auto(self, model):
         while True:
+            logger.debug("Collecting dataset" + str(time.time()))
             state = self.car.get_state_vector(latest=True)
-            
-            collisions = state['sensors']
+            print ("Got state " + str(time.time()))
 
+            #collisions = state['sensors']
+        
+            #frame = np.hstack([state['camera_l'], state['camera_c'], state['camera_r']])
             frame = state['camera_c']
+            
+            frame = color.rgb2gray(frame)
+            print ("Converted " + str(time.time()))
+
+            
+            if self.show_camera:
+                cv2.imshow("Image", frame)
+                cv2.waitKey(1)
+            
+            print ("Showing"  + str(time.time()))
             frame = misc.imresize(frame, 10)
+            print ("Resized"  + str(time.time()))
             frame = frame.astype('float32')
+            print ("done type " + str(time.time()))
             frame /= 255
-            frame = frame.reshape(1, frame.shape[0]*frame.shape[1])
+            print ("done dvision "  + str(time.time()))
+            frame = frame.reshape(1, 1, frame.shape[0], frame.shape[1])
+            print ("preprocessing done"  + str(time.time()))
+
             action = model.predict(frame) # we get a integer
             action = np.argmax(action, axis=1)[0]
             action = ACTIONS[action]    # convert integer to function name eg forward, forwardLeft...
             
-            logger.debug("Predicted Action: " + action)
+            logger.debug("Predicted Action: " + action + " " + str(time.time()))
 
             #logger.debug("Collisions: " + collisions)        
+            """
             can_take_action = True    
             
             for name in collisions:
                 if collisions[name] == True and COLLISIONS[action] == name:
                     can_take_action = False
-                    logger.debug("Collision detected")
+                    logger.debug("Collision detected" + " " + str(time()))
                     break
 
-            logger.debug("can_take_action: " + str(can_take_action))        
+            logger.debug("can_take_action: " + str(can_take_action) + " " + str(time()))        
+            """
 
-            if can_take_action:
-                self.car.take_action(action)
-                sleep(self.car.timeframe) # Wait for action to complete
-                    
+            #if can_take_action:
+            logger.debug("Taking action " + str(time.time()))
+            self.car.take_action(action)
+            sleep(self.car.timeframe) # Wait for action to complete            
             self.car.stop()
+            logger.debug("Car Stopped " + str(time.time()))
+            # sleep(1) # Wait for action to complete
+            print ("="*80)
+            
 
     def action_nowait(self, action):
         if action not in ACTIONS:
