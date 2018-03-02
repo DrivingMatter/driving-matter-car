@@ -11,24 +11,22 @@ import io
 from time import time
 
 c = Camera(USB, camera_num=1, resolution=(320, 240), framerate=10, rotation=-1)
+print "Starting..."
 c.start()
+print "Started"
 
-
-framerate = [0, 0]
 start = time()
 while True:
 
     if c.ready and c.more():
-        framerate[1] += 1
         
         frame = c.get_frame()
-        if frame is not None:
-            cv2.imshow("camera_c", frame)
-            #stream.seek(0)
-            key = cv2.waitKey(1) & 0xFF
+        #if frame is not None:
+        #    cv2.imshow("camera_c", frame)
+        #    #stream.seek(0)
+        #    key = cv2.waitKey(1) & 0xFF
 
-        if time() - start > 1:
-            framerate = [sum(framerate)/2, 0]
-            start = time()
-
-        print ("FPS: " + str(framerate[0]))
+        #if time() - start > 1:
+        #    framerate = [sum(framerate)/2, 0]
+        #    start = time()
+        print ("FPS: " + str(c.fps))

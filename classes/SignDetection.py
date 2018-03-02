@@ -16,17 +16,37 @@ class SignDetection:
         self.image=[]
         self.sign={}
          
-        self.sign['Traffic light']= cv2.CascadeClassifier("../classifiers/HAAR/trafficlight_classifier.xml")
+        self.sign['Traffic light']= cv2.CascadeClassifier("../classifiers/16/cascade.xml")
         self.sign['Stop']= cv2.CascadeClassifier("../classifiers/HAAR/stopsign_classifier.xml")
         self.sign['No Left'] = cv2.CascadeClassifier("../classifiers/HAAR/noleftturn_classifier.xml")
-        self.red_light = False
-        self.green_light = False
-        self.yellow_light = False
+                
+        self.detected = {
+		"Stop" : False,
+		"No Left" : False,
+		"Red Light" : False,
+		"Green Light" : False,
+		"Yellow Light" : False		
+	    }
         self.alpha = 8.0 * math.pi / 180
         self.v0 = 119.865631204
         self.ay = 332.262498472
         self.focal_length=(57*40)/4.5
         
+    def destroy(self):
+        self.detected = {
+		"Stop" : False,
+		"No Left" : False,
+		"Red Light" : False,
+		"Green Light" : False,
+		"Yellow Light" : False		
+	    }
+        self.image=[]
+        
+        
+    def worker(arg):
+        classifier, image, type = arg
+        return self.detect_obj(classifier,image, type)
+
     def detect_obj(self,classifier,image,type=""):
         self.image=image
         
@@ -38,17 +58,17 @@ class SignDetection:
         if type=='Traffic light':
             sign=classifier.detectMultiScale(
             gray_image,
-            scaleFactor=1.02,
+            scaleFactor=1.03,
             minNeighbors=2,
-            minSize=(50,50),
+            minSize=(20,20),
             flags=cv2.CASCADE_SCALE_IMAGE
             )
         else:    
             sign=classifier.detectMultiScale(
                 gray_image,
-                scaleFactor=1.08,
-                minNeighbors=1,
-                minSize=(30,30),
+                scaleFactor=1.2,
+                minNeighbors=2,
+                minSize=(40,40),
                 flags=cv2.CASCADE_SCALE_IMAGE
                 )
         
@@ -58,6 +78,7 @@ class SignDetection:
            # d=self.distance_to_camera(v, 15.5 - 10, 300)
             d=self.distance_to_camera_temp(v)
             cv2.putText(self.image, "%s %.1fcm" %(type, d), (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,219,0), 1)
+     	    self.detected[type]=True
             if type=='Traffic light':
                 boundaries = [
                   ([17, 15, 100], [50, 50, 204]),  #red
@@ -77,19 +98,19 @@ class SignDetection:
                     pos=len(gray)/3
                     if maxVal:
                         if pos > maxLoc[1]:
-                            #cv2.putText(self.image, 'Red', (x+5, y-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
-                            self.red_light = True
+                            cv2.putText(self.image, 'Red', (x+5, y-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+                            self.detected['Red Light'] = True
                             break
                         
                         # Green light  (This has problem, becuase of range)
                         elif 3*pos > maxLoc[1] > 2*pos:
-                           # cv2.putText(self.image, 'Green', (x+5, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
-                            self.green_light = True
+                            cv2.putText(self.image, 'Green', (x+5, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+                            self.detected['Green Light'] = True
                             break
                         # yellow light
                         elif 2*pos > maxLoc[1] > pos:
-                           # cv2.putText(self.image, 'Yellow', (x+5, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
-                            self.yellow_light = True
+                            cv2.putText(self.image, 'Yellow', (x+5, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
+                            self.detected['Yellow Light'] = True
                             break
                     
                 
@@ -97,41 +118,25 @@ class SignDetection:
         
     def detect(self,image):
         self.image=image
-        
-        
-        
-##        self.detect_obj(stop_classifier)
+            
         signs = [key for key in self.sign]
+##       pool = Pool(3)
+##        pool.map(self.worker, ((self.sign[key], image, key) for key in self.sign))
+##        pool.close()
+##        pool.join()
+##        for type in signs:
+##            self.detect_obj(self.sign[type],image,type)
+##        
         t={}
         for type in signs:
             t[type]=Thread(target = self.detect_obj,args=(self.sign[type],self.image,type))
             t[type].start()
+##            t[type].join()
         [t[type].join() for type in signs]    
-            
-##        gray_image = cv2.cvtColor(image , cv2.COLOR_BGR2GRAY)
-##        stop_sign = stop_classifier.detectMultiScale(gray_image,1.02,10)
-##        traffic_light = light_classifier.detectMultiScale(gray_image,1.02,10)
-##        no_left = noleft_classifier.detectMultiScale(gray_image,1.02,10)
-##
-##        for (x,y,w,h) in stop_sign:
-##            cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,0),2)
-##            v = y + h - 5
-##            d=self.distance_to_camera(v, 15.5 - 10, 100, image)
-##            cv2.putText(image, "STOP %.1fcm" % d, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 2)
-##            
-##        for (x,y,w,h) in traffic_light:
-##            cv2.rectangle(image,(x,y),(x+w,y+h),(255,255,255),2)
-##            v = y + h - 5
-##            d=self.distance_to_camera(v, 15.5 - 10, 100, image)
-##            cv2.putText(image, 'Traffic Light %.1fcm' % d, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-##        
-##        for (x,y,w,h) in no_left:
-##             cv2.rectangle(image,(x,y),(x+w,y+h),(0,255,0),2)
-##             v = y + h - 5
-##             d=self.distance_to_camera(v, 15.5 - 10, 100, image)
-##             cv2.putText(image, 'No-left-Turn %.1fcm' % d, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255,0), 2)
-##
-        
+        detected={}    
+        image=self.image
+        detected=self.detected
+        self.destroy()
         return image
     
     def distance_to_camera(self, v, h, x_shift):

@@ -24,23 +24,20 @@ class Driver:
         
     def detect_sign(self, datavector):
         
+        s1 = time.time()
         sign_detection= SignDetection()
-        camera_names = [key for key in datavector if key.startswith('camera')]
-        for name in camera_names:
-
-            if name not in self.cv2_window_name:
-                self.cv2_window_name.append(name)
-
-            frame = datavector[name]
-            width, height, channel = frame.shape
-            frame=cv2.resize(frame,(int(width),int(height/2)),interpolation=cv2.INTER_AREA)
-            frame = sign_detection.detect(frame)
-            #frame=cv2.resize(frame,(int(width),int(height*2)),interpolation=cv2.INTER_AREA)
-            print(time.time())
+        name = 'camera_c'
+        frame = datavector[name]
+        width, height, channel = frame.shape
+        #frame=cv2.resize(frame,(int(width),int(height/2)),interpolation=cv2.INTER_AREA)
+        frame = sign_detection.detect(frame)
+        #frame=cv2.resize(frame,(int(width),int(height*2)),interpolation=cv2.INTER_AREA)
+        print "{}".format(time.time()-s1)
+        
+        cv2.imshow(name, frame)
+        cv2.waitKey(1)  # CV2 Devil - Don't dare to remove
             
-            cv2.imshow(name, frame)
-            cv2.waitKey(1)  # CV2 Devil - Don't dare to remove
-            
+        
     def display_camera(self, datavector):
         camera_names = [key for key in datavector if key.startswith('camera')]
         for name in camera_names:

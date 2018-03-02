@@ -10,7 +10,7 @@ else:
     from Queue import Queue
 from threading import Thread
 import io
-from time import sleep
+from time import sleep, time
 import numpy as np
 
 PICAMERA = 0
@@ -18,6 +18,7 @@ USB = 1
 
 class Camera():
     def __init__(self, camera_type, camera_num=0, resolution=(320, 240), framerate=20, rotation=0):
+        self.fps = None
         self.ready = False
         self.camera = None
         self.camera_type = camera_type
@@ -64,7 +65,7 @@ class Camera():
             self.camera = cv2.VideoCapture(camera_num)
             self.camera.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, w)
             self.camera.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, h)
-            self.camera.set(cv2.cv.CV_CAP_PROP_FPS, framerate)
+            #self.camera.set(cv2.cv.CV_CAP_PROP_FPS, framerate) # doesnt works, using sleep to maintain fps
         else:
             raise EnviormentError("Invalid camera type")
 
@@ -81,18 +82,30 @@ class Camera():
             f = self.update_usb
 
         self.t = Thread(target=f, args=())
-        #self.t.daemon = True
+        self.t.daemon = True
         self.t.start()
 
     def update_picamera(self):
         stream = PiRGBArray(self.camera)
         image = self.camera.capture_continuous(stream, format="bgr", use_video_port=True)
             
+        start = time()
+        temp_fps = 0
+        
         while True:
             if self.stopped:
                 return
 
             frame = image.next()
+            
+            # Framerate updater
+            if (time()-start) >= 1:
+                self.fps = temp_fps
+                temp_fps = 0
+                start = time()
+            temp_fps += 1
+            
+            
             frame = frame.array
             stream.truncate(0)
             
@@ -105,17 +118,27 @@ class Camera():
             self.ready = True
 
     def update_usb(self):
+        start = time()
+        temp_fps = 0
         while True:
             if self.stopped:
                 return
-
+            
             (grabbed, frame) = self.camera.read()
-
+            
+            # Framerate updater
+            if (time()-start) >= 1:
+                self.fps = temp_fps
+                temp_fps = 0
+                start = time()
+            temp_fps += 1
+            
             if not grabbed:
                 self.stop()
                 return
 
-            #frame = cv2.flip(frame, self.rotation)
+            if self.rotation != 0:
+                frame = cv2.flip(frame, self.rotation)
             
             if self.Q.full():
                 self.Q.get()
@@ -125,7 +148,7 @@ class Camera():
             
             self.ready = True
                 
-            sleep(self.framerate_ms)
+            sleep(self.framerate_ms) # webcam doesn't go over 9 fps on Raspberry Pi
             
     def stop(self):
         self.stopped = True
@@ -142,29 +165,13 @@ class Camera():
         return self.ready
 
     def get_frame(self, latest = False):
-        #print ("Here1")
         if latest and not self.Q.empty():
             size = self.Q.qsize()
-            #print ("Here2    size=" + str(size))
-            for i in range(size):
-                self.history = self.Q.get()
-            #print ("Here3")
-            return self.history
+            for i in range(size-2): # Keep atleast x values in queue
+                self.Q.get()
+            return self.Q.get()#, size
         else:
-            #print ("Here4")
-            return self.Q.get(timeout=30)
-
-        #logging.info("Camera Queue: " + str(self.Q.qsize()))
-        # while latest:
-        #     #logging.info("Camera Queue: " + str(self.Q.qsize()))
-        #     if not self.Q.empty() and history == False:
-        #         self.history = self.Q.get()
-        #     else:
-        #         break
-        # else:
-        #     if not self.Q.empty():
-        #         self.history = self.Q.get()        
-        # return self.history
+            return self.Q.get(timeout=3)#, "Wait" # OpenCV throw select timeout after 10 sec
 
     def clear_queue(self):
         self.Q.clear()

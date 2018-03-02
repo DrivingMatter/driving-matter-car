@@ -20,6 +20,7 @@ class State(tornado.websocket.WebSocketHandler):
         self.t = None
         self.car = kwargs.pop('car')
         self.rps_ms = kwargs.pop('rps_ms') # Request Per Seconds Milliseconds
+        self.for_network = kwargs.pop('for_network')
 
         self.timer = [0, 0]
         self.timer_index = 0
@@ -69,7 +70,7 @@ class State(tornado.websocket.WebSocketHandler):
         car_rps = self.timer[0]
         logging.debug("RPS: " + str(car_rps))
         state = {}
-        state = self.car.get_state_vector(latest=True, for_network=True)
+        state = self.car.get_state_vector(latest=True, for_network=self.for_network)
         state['car_rps'] = car_rps
         try:
             self.write_message(state, True)

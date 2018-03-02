@@ -13,7 +13,7 @@ logger = logging.getLogger("play_fun.py")
 logger.debug("ACTIONS = " + str(ACTIONS))
 
 car, rps_ms, port = load_car("../config.json")
-#driver = Driver(car, show_camera = False)
+driver = Driver(car, show_camera = False)
 
 def execute_action(action):
     logger.debug("Action :" + action)

@@ -113,7 +113,7 @@ class Car4W:
     def get_state(self):
         return self.state
 
-    def get_state_vector(self, latest=False, for_network=False): # for_network convert numpy to list because it is faster for pickle
+    def get_state_vector(self, latest=False, for_network=True): # for_network convert numpy to list because it is faster for pickle
         start_time = time.time()
 
         state = {}
@@ -123,21 +123,25 @@ class Car4W:
         state['sensors'] = sensors
         
         # ADDING: Camera data
+        fps = []
         for camera in self.cameras:
             name = camera[0]
+            fps.append(camera[1].fps)
+            
             frame = camera[1].get_frame(latest)
-
+            
+            if for_network == False: # It is for Desktop GUI (Python)
+                frame = [str(frame.dtype), base64.b64encode(frame).decode("utf-8"), frame.shape]
             if for_network == True:
-                # Sending NumPy 
-                #frame = [str(frame.dtype), base64.b64encode(frame).decode("utf-8"), frame.shape]
-                stream = cStringIO.StringIO()
+                stream = cStringIO.StringIO()               
                 frame = frame[:,:,::-1]
                 #frame = np.roll(frame, 1, axis=-1) # BGR to RGB
-                frame = Image.fromarray(frame, 'RGB')
+                frame = Image.fromarray(frame, 'RGB') # Takes 150 ms - Slow RPS
                 frame.save(stream, format="JPEG")
                 frame = base64.b64encode(stream.getvalue()).decode("utf-8")
-
+            
             state[name] = frame
+        #logger.debug("All Camera FPS: {}".format(min(fps)))
         #logger.debug("Received State in {} seconds".format(time.time() - start_time))
         return state # converted to pickle in State.py
 
