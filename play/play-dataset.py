@@ -40,7 +40,7 @@ try:
                 execute_action("forwardLeft")
             elif c == 4: # Space
                 execute_action("stop")
-    sleep(0.05)
+    sleep(0.001)
 finally:
     driver.close()
     car.close()

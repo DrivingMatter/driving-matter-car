@@ -9,6 +9,7 @@ from classes.State import ACTIONS, ACTIONS_REVERSE
 from classes.Dataset import Dataset
 from classes.LoadCar import load_car
 from classes.KBhit import KBHit
+from classes.SignDetection import SignDetection
 
 from scipy import misc
 from PIL import Image
@@ -31,10 +32,10 @@ from keras.optimizers import RMSprop
 
 logger = logging.getLogger("play_rl.py")
 logger.debug("ACTIONS = " + str(ACTIONS))
-
+sign_detection= SignDetection()
 class CarEnv:
     def __init__(self, car):
-        self.actions = ('forward', 'forwardRight', 'forwardLeft') #, 'backward')
+        self.actions = ('forward', 'stop' )#, 'forwardLeft') #, 'backward')
         self.car = car
         self.cameras_size = 3 * 32 * 24
         self.sensors_size = 3
@@ -67,18 +68,21 @@ class CarEnv:
 
         sensors = state['sensors']
         sensors_list = np.array([float(sensors[sensor]) for sensor in sensors])
-
-        cl = self._process_image(state['camera_l'])
+        print sensors_list
+        #cl = self._process_image(state['camera_l'])
+        detected =sign_detection.detect(state['camera_c'])
+        detected_list = np.array([float(detected[item]) for item in detected])
+       # print detected
         cc = self._process_image(state['camera_c'])
-        cr = self._process_image(state['camera_r'])
+        #cr = self._process_image(state['camera_r'])
         
-        cameras = np.array([cl, cc, cr])
+        cameras = np.array([cc])
         cameras = cameras.reshape(-1)
 
         state = np.append(cameras, sensors_list)
-
+        state = np.append(state,detected_list)
         
-        return state, sensors
+        return state, sensors,detected
 
     def take_step(self, action):
         self.car.take_action(ACTIONS[action])
@@ -89,14 +93,20 @@ class CarEnv:
         self.take_step(action)
         self.taken_actions.put(action)
 
-        state, sensors = self.get_state()
+        state, sensors ,detected= self.get_state()
 
         reward = self.reward_step
         print sensors
         for sensor in sensors:
             if sensors[sensor]:
                 reward += self.reward_sensor
-
+        stop = [key for key in detected if key.startswith('stop')]
+        if stop:
+            if action==0:
+                reward -=2
+            else:
+                reward += 2
+            
         done = None # To be implement using OpenCV
 
         info = None
@@ -182,15 +192,16 @@ if __name__ == "__main__":
 
     state_size = env.state_size
     action_size = len(env.actions)
+    state, sensors, _ = env.get_state()
     
-    agent = DQNAgent(state_size, action_size, 32)
+    agent = DQNAgent(len(state), action_size, 32)
     logger.debug("DQNAgent setup done")
 
-    # agent.load("../save/rl-model.dat")
+    agent.load("../save/rl-model.dat")
 
     for e in range(EPISODES):
         #env.reset()
-        state, sensors = env.get_state()
+        state, sensors,_ = env.get_state()
 
         state = np.reshape(state, [1, -1])
 
@@ -215,5 +226,5 @@ if __name__ == "__main__":
                 break
         #env.reset()
         agent.replay()
-        # if e % 10 == 0:
-            # agent.save("../save/rl-model.dat")
+        if e % 10 == 0:
+            agent.save("../save/rl-model.dat")

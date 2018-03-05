@@ -29,7 +29,7 @@ while True:
     #frame = misc.imresize(state['camera_c'], 10)
     
     start_detect = time()
-    frame = sign_detection.detect(state['camera_c'])
+    frame,_ = sign_detection.detect(state['camera_c'])
     elapsed_detect = time() - start_detect
     
     

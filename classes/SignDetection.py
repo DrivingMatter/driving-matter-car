@@ -137,7 +137,7 @@ class SignDetection:
         image=self.image
         detected=self.detected
         self.destroy()
-        return image
+        return image, detected
     
     def distance_to_camera(self, v, h, x_shift):
         return h / math.tan(self.alpha + math.atan((v - self.v0) / self.ay))

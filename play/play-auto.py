@@ -10,6 +10,9 @@ import logging
 from time import sleep, time
 import pickle
 from keras.models import model_from_json
+import os
+
+#os.nice(-20)
 
 logger = logging.getLogger("play_auto.py")
 
@@ -17,12 +20,12 @@ logger.debug("ACTIONS = " + str(ACTIONS))
 
 logging.debug("Loading model")
 
-json_file = open('../models/model003.json', 'r')
+json_file = open('../models/model002F-2.json', 'r')
 loaded_model_json = json_file.read()
 json_file.close()
 
 loaded_model = model_from_json(loaded_model_json)
-loaded_model.load_weights("../models/model003.h5")
+loaded_model.load_weights("../models/model002F-2.h5")
 
 loaded_model.compile(loss='categorical_crossentropy',
                   optimizer='adadelta',

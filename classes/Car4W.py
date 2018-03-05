@@ -113,7 +113,7 @@ class Car4W:
     def get_state(self):
         return self.state
 
-    def get_state_vector(self, latest=False, for_network=True): # for_network convert numpy to list because it is faster for pickle
+    def get_state_vector(self, latest=False, for_network=None): # for_network convert numpy to list because it is faster for pickle
         start_time = time.time()
 
         state = {}

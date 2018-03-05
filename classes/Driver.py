@@ -68,19 +68,18 @@ class Driver:
                 cv2.imshow("Image", frame)
                 cv2.waitKey(1)
             
-            print ("Showing"  + str(time.time()))
+            print ("Showing "  + str(time.time()))
             frame = misc.imresize(frame, 10)
-            print ("Resized"  + str(time.time()))
-            logger.debug("Collected state")
+            print ("Resized "  + str(time.time()))
+            #logger.debug("Collected state")
 
-            collisions = state['sensors']
+            #collisions = state['sensors']
 
+            #frame = np.hstack([state['camera_l'], state['camera_c'], state['camera_r']])
+            #print (frame.shape)
 
-            frame = np.hstack([state['camera_l'], state['camera_c'], state['camera_r']])
-            print (frame.shape)
-
-            frame = misc.imresize(frame, (32, 96))
-            frame = rgb2gray(frame)
+            #frame = misc.imresize(frame, (32, 96))
+            #frame = rgb2gray(frame)
             frame = frame.astype('float32')
             print ("done type " + str(time.time()))
             frame /= 255
@@ -112,7 +111,7 @@ class Driver:
             sleep(self.car.timeframe) # Wait for action to complete            
             self.car.stop()
             logger.debug("Car Stopped " + str(time.time()))
-            # sleep(1) # Wait for action to complete
+            #sleep(1) # Wait for action to complete
             print ("="*80)
             
 
@@ -128,9 +127,9 @@ class Driver:
 
         state0 = self.car.get_state_vector(latest=True)
 
-        if self.show_camera:
-            logger.debug("State 0 Showing")
-            self.display_camera(state0)
+        #if self.show_camera:
+        #    logger.debug("State 0 Showing")
+        #    self.display_camera(state0)
 
         logger.debug("Taking action")
         self.car.take_action(action)
@@ -144,7 +143,7 @@ class Driver:
             logger.debug("State 1 Showing")
             self.display_camera(state1)
 
-        return state0, action, state1       
+        return state0, action, state1      
 
     def process_dataset_vector(self, state0, a, state1):
         datavector = {} 
@@ -158,10 +157,10 @@ class Driver:
         datavector['action'] = ACTIONS.index(a)
         datavector_title.append('action')
 
-        for key in state1:
-            name = 'state1_' + key
-            datavector[name] = state1[key]
-            datavector_title.append(name)
+        #for key in state1:
+        #    name = 'state1_' + key
+        #    datavector[name] = state1[key]
+        #    datavector_title.append(name)
 
         datavector['time'] = str(datetime.now())
         datavector_title.append("time")
