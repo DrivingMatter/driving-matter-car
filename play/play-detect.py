@@ -3,7 +3,7 @@ from os import path
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from classes.Driver import Driver
 from classes.State import ACTIONS
-from classes.Dataset import Dataset
+#from classes.Dataset import Dataset
 from classes.LoadCar import load_car
 from classes.KBhit import KBHit
 import logging
@@ -39,11 +39,11 @@ try:
 
         datavector = car.get_state_vector()
         
-        driver.detect_sign(datavector)
+        driver.display_camera(datavector)
         
         sleep(0.05)
 finally:
     driver.close()
     car.close()
-    dataset.close()
+ #   dataset.close()
     kb.set_normal_term()
