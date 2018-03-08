@@ -53,7 +53,7 @@ from keras.optimizers import RMSprop
 from keras.layers import Dense, Dropout, Flatten, Activation
 from keras.layers import Conv2D, MaxPooling2D
 from keras import backend as K
-K.set_image_dim_ordering('th')
+##K.set_image_dim_ordering('th')
 
 from keras.utils import to_categorical
 
@@ -70,8 +70,8 @@ import numpy as np
 
 import random
 resized_img = 10
-
-logger = logging.getLogger("play_rl.py")
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger("play-rl-sim.py")
 logger.debug("ACTIONS = " + str(ACTIONS))
 sign_detection= SignDetection()
 class CarEnv:
@@ -139,8 +139,8 @@ class CarEnv:
 
         image = self.X[i]
 
-        image,detected =sign_detection.detect(image)
-        cv2.imshow("camera_c", image)
+        image1,detected =sign_detection.detect(image)
+        cv2.imshow("camera_c", image1)
         cv2.waitKey(1)
 
         print detected
@@ -164,7 +164,7 @@ class CarEnv:
         # self.take_step(action)
         self.taken_actions.put(action)
 
-        if action == 'stop':
+        if action == 1:
             self.get_dataset_index(0) # next frame
         else:
             self.get_dataset_index(1) # next frame
@@ -349,6 +349,6 @@ if __name__ == "__main__":
         #env.reset()
         agent.replay()
         if e % 2 == 0:
-            agent.save("../save/rl-model.dat")
+            agent.save("../../save/rl-model.dat")
         
             

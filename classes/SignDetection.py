@@ -55,6 +55,8 @@ class SignDetection:
         
         #self.image=cv2.resize(self.image,(int(width/10),int(height/10)),interpolation=cv2.INTER_AREA)
         gray_image = cv2.cvtColor(self.image , cv2.COLOR_BGR2GRAY)
+        
+        gray_image = self.image
         if type=='Traffic light':
             sign=classifier.detectMultiScale(
             gray_image,
@@ -73,6 +75,7 @@ class SignDetection:
                 )
         
         for (x,y,w,h) in sign:
+            print "in detect"
             cv2.rectangle(self.image,(x,y),(x+w,y+h),(255,219,0),2)
             v = y + h - 5
            # d=self.distance_to_camera(v, 15.5 - 10, 300)

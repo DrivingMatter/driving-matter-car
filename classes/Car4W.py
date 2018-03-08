@@ -55,9 +55,9 @@ class Car4W:
         self.cameras = cameras
         for camera in self.cameras:
             camera[1].start()
-            
+        logger.debug("Camera start called")
         for camera in self.cameras:
-            while not camera[1].ready:
+            while not camera[1].more():
                 sleep(0.5)
             logger.debug(camera[0] + " is ready.")
         logger.info("Cameras are ready.")
