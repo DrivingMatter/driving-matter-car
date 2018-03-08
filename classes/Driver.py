@@ -59,38 +59,46 @@ class Driver:
             #collisions = state['sensors']
         
             #frame = np.hstack([state['camera_l'], state['camera_c'], state['camera_r']])
-            frame = state['camera_c']
             
-            frame = color.rgb2gray(frame)
-            print ("Converted " + str(time.time()))
-            
-            if self.show_camera:
-                cv2.imshow("Image", frame)
-                cv2.waitKey(1)
-            
-            print ("Showing "  + str(time.time()))
-            frame = misc.imresize(frame, 10)
-            print ("Resized "  + str(time.time()))
-            #logger.debug("Collected state")
+            actions = {}              
+            for name in ['camera_c']:#, 'camera_l', 'camera_r']:
+                frame = state[name]
+                frame = color.rgb2gray(frame)
+                #print ("Converted " + str(time.time()))
+                
+                if self.show_camera:
+                    cv2.imshow(name, frame)
+                    cv2.waitKey(1)
+                
+                #print ("Showing "  + str(time.time()))
+                frame = misc.imresize(frame, 10)
+                #print ("Resized "  + str(time.time()))
+                
+                frame = frame.astype('float32')
+                #print ("done type " + str(time.time()))
+                frame /= 255
+                #print ("done dvision "  + str(time.time()))
+                frame = frame.reshape(1, 1, frame.shape[0], frame.shape[1]) # CNN
+                #print frame.shape
+                #frame = frame.reshape(1, frame.shape[0] * frame.shape[1]) # MLP
+                #print frame.shape
+                #print ("preprocessing done"  + str(time.time()))
+                action = model.predict(frame) # we get a integer
+                action = np.argmax(action, axis=1)[0]
+                action = ACTIONS[action]    # convert integer to function name eg forward, forwardLeft...
+                
 
-            #collisions = state['sensors']
+                actions[name] = action
+                #logger.debug("Predicted Action: " + action + " " + name)
 
-            #frame = np.hstack([state['camera_l'], state['camera_c'], state['camera_r']])
-            #print (frame.shape)
+            # print actions
+            # if actions['camera_l'] == actions['camera_r']:
+            #     action = actions['camera_l']
+            # else:
+            #     action = actions['camera_c'];
 
-            #frame = misc.imresize(frame, (32, 96))
-            #frame = rgb2gray(frame)
-            frame = frame.astype('float32')
-            print ("done type " + str(time.time()))
-            frame /= 255
-            print ("done dvision "  + str(time.time()))
-            frame = frame.reshape(1, 1, frame.shape[0], frame.shape[1])
-            print ("preprocessing done"  + str(time.time()))
-            action = model.predict(frame) # we get a integer
-            action = np.argmax(action, axis=1)[0]
-            action = ACTIONS[action]    # convert integer to function name eg forward, forwardLeft...
-            
-            logger.debug("Predicted Action: " + action + " " + str(time.time()))
+            print actions['camera_c']
+
 
             #logger.debug("Collisions: " + collisions)        
             """
@@ -106,12 +114,15 @@ class Driver:
             """
 
             #if can_take_action:
+            
+            
             logger.debug("Taking action " + str(time.time()))
-            self.car.take_action(action)
+            self.car.take_action(actions['camera_c'])
             sleep(self.car.timeframe) # Wait for action to complete            
             self.car.stop()
             logger.debug("Car Stopped " + str(time.time()))
-            #sleep(1) # Wait for action to complete
+            
+            sleep(0.5) # Wait for action to complete
             print ("="*80)
             
 
