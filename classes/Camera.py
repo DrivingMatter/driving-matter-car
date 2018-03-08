@@ -147,8 +147,9 @@ class Camera():
             #logging.info("Camera(): Frame added to queue")
             
             self.ready = True
-                
-            sleep(self.framerate_ms) # webcam doesn't go over 9 fps on Raspberry Pi
+            
+            sleep(0.2)
+            #sleep(self.framerate_ms) # webcam doesn't go over 9 fps on Raspberry Pi
             
     def stop(self):
         self.stopped = True

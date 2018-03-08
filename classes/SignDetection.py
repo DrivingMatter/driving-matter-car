@@ -16,29 +16,29 @@ class SignDetection:
         self.image=[]
         self.sign={}
          
-        self.sign['Traffic light']= cv2.CascadeClassifier("../classifiers/16/cascade.xml")
+     #   self.sign['Traffic light']= cv2.CascadeClassifier("../classifiers/16/cascade.xml")
         self.sign['Stop']= cv2.CascadeClassifier("../classifiers/HAAR/stopsign_classifier.xml")
-        self.sign['No Left'] = cv2.CascadeClassifier("../classifiers/HAAR/noleftturn_classifier.xml")
+      #  self.sign['No Left'] = cv2.CascadeClassifier("../classifiers/HAAR/noleftturn_classifier.xml")
                 
         self.detected = {
-		"Stop" : False,
-		"No Left" : False,
-		"Red Light" : False,
-		"Green Light" : False,
-		"Yellow Light" : False		
+		"Stop" : False
+	#	"No Left" : False,
+	#	"Red Light" : False,
+	#	"Green Light" : False,
+	#	"Yellow Light" : False		
 	    }
         self.alpha = 8.0 * math.pi / 180
         self.v0 = 119.865631204
         self.ay = 332.262498472
-        self.focal_length=(57*40)/4.5
+        self.focal_length=(24*62)/5.0
         
     def destroy(self):
         self.detected = {
-		"Stop" : False,
-		"No Left" : False,
-		"Red Light" : False,
-		"Green Light" : False,
-		"Yellow Light" : False		
+		"Stop" : False
+	#	"No Left" : False,
+	#	"Red Light" : False,
+	#	"Green Light" : False,
+	#	"Yellow Light" : False		
 	    }
         self.image=[]
         
@@ -55,6 +55,8 @@ class SignDetection:
         
         #self.image=cv2.resize(self.image,(int(width/10),int(height/10)),interpolation=cv2.INTER_AREA)
         gray_image = cv2.cvtColor(self.image , cv2.COLOR_BGR2GRAY)
+        
+        gray_image = self.image
         if type=='Traffic light':
             sign=classifier.detectMultiScale(
             gray_image,
@@ -67,18 +69,20 @@ class SignDetection:
             sign=classifier.detectMultiScale(
                 gray_image,
                 scaleFactor=1.2,
-                minNeighbors=2,
-                minSize=(40,40),
+                minNeighbors=1,
+                minSize=(20,20),
                 flags=cv2.CASCADE_SCALE_IMAGE
                 )
         
         for (x,y,w,h) in sign:
+            print "in detect"
             cv2.rectangle(self.image,(x,y),(x+w,y+h),(255,219,0),2)
             v = y + h - 5
            # d=self.distance_to_camera(v, 15.5 - 10, 300)
             d=self.distance_to_camera_temp(v)
-            cv2.putText(self.image, "%s %.1fcm" %(type, d), (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,219,0), 1)
-     	    self.detected[type]=True
+            cv2.putText(self.image, "%s %.1fcm" %(type, d), (x, y+h+15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,219,0), 1)
+            if d < 28.0:
+                self.detected[type]=True
             if type=='Traffic light':
                 boundaries = [
                   ([17, 15, 100], [50, 50, 204]),  #red
@@ -137,7 +141,7 @@ class SignDetection:
         image=self.image
         detected=self.detected
         self.destroy()
-        return image, detected
+        return image,detected
     
     def distance_to_camera(self, v, h, x_shift):
         return h / math.tan(self.alpha + math.atan((v - self.v0) / self.ay))
