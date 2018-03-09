@@ -1,6 +1,6 @@
 from enum import Enum
 
-ACTIONS = ('forward', 'forwardLeft', 'forwardRight', 'backward', 'backwardRight', 'backwardLeft', 'stop')
+ACTIONS = ('forward', 'stop')#'forwardLeft', 'forwardRight', 'backward', 'backwardRight', 'backwardLeft', 'stop')
 ACTIONS_REVERSE = {
     'forward'       : 'backward',
     'forwardLeft'   : 'forwardRight',
