@@ -28,8 +28,6 @@ def save_dataset():
         dataset.save_data(datavector, datavector_title)
 
         logging.debug("Dataset saved")
-        
-        print ("Running")
 
 t = Thread(target=save_dataset)
 t.daemon = True
