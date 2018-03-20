@@ -57,6 +57,7 @@ try:
                 execute_action("forwardLeft")
             elif c == 4: # Space
                 execute_action("stop")
+            kb.clear()
         sleep(0.1)
 finally:
     driver.close()

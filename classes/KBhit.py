@@ -108,7 +108,11 @@ class KBHit:
         else:
             dr,dw,de = select([sys.stdin], [], [], 0)
             return dr != []
-
+    
+    def clear(self):    
+        while self.kbhit():
+            self.getch()
+    
 
 if __name__ == "__main__":
 
