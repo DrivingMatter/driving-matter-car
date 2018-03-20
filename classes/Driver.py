@@ -86,7 +86,7 @@ class Driver:
                     cv2.waitKey(1)
                 
                 #print ("Showing "  + str(time.time()))
-                frame = misc.imresize(frame, 10)
+                frame = misc.imresize(frame, 20) # Input image is 160x120
                 #print ("Resized "  + str(time.time()))
                 
                 frame = frame.astype('float32')
@@ -112,7 +112,7 @@ class Driver:
             # else:
             #     action = actions['camera_c'];
 
-            print actions['camera_c']
+            #print actions['camera_c']
 
 
             #logger.debug("Collisions: " + collisions)        
