@@ -12,6 +12,7 @@ import cv2
 import io
 import numpy as np
 import time
+from multiprocessing import Process, Pipe
 
 def rgb2gray(rgb):
     return np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
@@ -21,11 +22,16 @@ class Driver:
         self.show_camera = show_camera
         self.car = car
         self.cv2_window_name = []
+        self.sign_detection = None
+        self.display_process = None
+        self.parent_pipe, self.child_pipe = None, None
         
     def detect_sign(self, datavector):
-        
         s1 = time.time()
-        sign_detection= SignDetection()
+        
+        if self.sign_detection is None:
+            self.sign_detection = SignDetection()
+
         name = 'camera_c'
         frame = datavector[name]
         width, height, channel = frame.shape
@@ -36,18 +42,27 @@ class Driver:
         
         cv2.imshow(name, frame)
         cv2.waitKey(1)  # CV2 Devil - Don't dare to remove
-            
-        
+    
     def display_camera(self, datavector):
-        camera_names = [key for key in datavector if key.startswith('camera')]
-        for name in camera_names:
+        if self.display_process is None:
+            self.parent_pipe, self.child_pipe = Pipe()
+            self.display_process = Process(target=self._display, args=(self.child_pipe,))
+            self.display_process.daemon = True
+            self.display_process.start()
+        self.parent_pipe.send(datavector)
+    
+    def _display(self, conn):
+        while True:
+            datavector = conn.recv()
+            camera_names = [key for key in datavector if key.startswith('camera')]
+            for name in camera_names:
 
-            if name not in self.cv2_window_name:
-                self.cv2_window_name.append(name)
+                if name not in self.cv2_window_name:
+                    self.cv2_window_name.append(name)
 
-            frame = datavector[name]
-            cv2.imshow(name, frame)
-            cv2.waitKey(1)  # CV2 Devil - Don't dare to remove
+                frame = datavector[name]
+                cv2.imshow(name, frame)
+                cv2.waitKey(1)  # CV2 Devil - Don't dare to remove
         
     def action_auto(self, model):
         logger.debug("Driver::action_auto()")

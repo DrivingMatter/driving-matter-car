@@ -1,7 +1,9 @@
 *.pickle
 *.dat
-/dataset/*
-!/dataset/empty
+play/dataset/*
+models/*
+!models/empty
+!dataset/empty
 *.pyc
 *.log
 *.out

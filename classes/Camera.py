@@ -148,8 +148,8 @@ class Camera():
             
             self.ready = True
             
-            sleep(0.2)
-            #sleep(self.framerate_ms) # webcam doesn't go over 9 fps on Raspberry Pi
+            #sleep(0.2)
+            sleep(self.framerate_ms) # webcam doesn't go over 9 fps on Raspberry Pi
             
     def stop(self):
         self.stopped = True
@@ -172,7 +172,7 @@ class Camera():
                 self.Q.get()
             return self.Q.get()#, size
         else:
-            return self.Q.get(timeout=3)#, "Wait" # OpenCV throw select timeout after 10 sec
+            return self.Q.get(timeout=10)#, "Wait" # OpenCV throw select timeout after 10 sec
 
     def clear_queue(self):
         self.Q.clear()

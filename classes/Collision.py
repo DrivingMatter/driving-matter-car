@@ -27,6 +27,7 @@ class Collision:
             return
 
         self.t = Thread(target=self.update, args=())
+        self.t.daemon = True
         self.t.start()
 
     def update(self):
@@ -46,7 +47,7 @@ class Collision:
 
             self.ready = True
 
-            sleep(0.2) # Required by UD Sensor Hardware
+            sleep(2) # Required by UD Sensor Hardware
 
     def stop(self):
         self.stopped = True

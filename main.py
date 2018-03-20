@@ -19,7 +19,7 @@ car, rps_ms, port = load_car("config.json")
 
 h = [
     (r"/action", Action.Action, {'car': car}),
-    (r"/state", State.State, {'car': car, 'rps_ms': rps_ms, 'for_network':False}) # rps_ms: Request Per Seconds Millisecond
+    (r"/state", State.State, {'car': car, 'rps_ms': rps_ms, 'for_network': True}) # rps_ms: Request Per Seconds Millisecond
 ]
 
 if __name__ == "__main__":

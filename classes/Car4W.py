@@ -61,31 +61,6 @@ class Car4W:
                 sleep(0.5)
             logger.debug(camera[0] + " is ready.")
         logger.info("Cameras are ready.")
-        
-        #Thread(target=self._auto_stop).start()
-
-    # def _auto_stop(self):
-    #     # Using take_action because we want to update action_id
-    #     logger.debug("_auto_stop()")
-    #     while True:
-    #         if self.state in [State.FORWARD, State.FORWARD_LEFT, State.FORWARD_RIGHT]:
-    #             collision = self.collision.get()
-    #             #logger.info("Ultrasonic Values: " + str(collision))
-    #             if collision.get("center") and self.state == State.FORWARD:
-    #                 logger.debug("Center collision detected, stopping.")
-    #                 self.take_action("stop")
-    #             elif collision.get("left") and self.state == State.FORWARD_LEFT:
-    #                 logger.debug("Left collision detected, stopping.")
-    #                 self.take_action("stop")
-    #             elif collision.get("right") and self.state == State.FORWARD_RIGHT:
-    #                 logger.debug("Right collision detected, stopping.")
-    #                 self.take_action("stop")
-    #             else:
-    #                 self.take_action("idle")
-    #         else:
-    #            self.take_action("idle")
-    #         print "auto_stop"
-    #         sleep(self.timeframe)
 
     def speed(self, speedup=1.5):
         percent = self.car_speed * speedup
@@ -126,13 +101,13 @@ class Car4W:
         fps = []
         for camera in self.cameras:
             name = camera[0]
-            fps.append(camera[1].fps)
-            
+            fps.append([camera[1].fps, camera[1].Q.qsize()])
+        
             frame = camera[1].get_frame(latest)
             
             if for_network == False: # It is for Desktop GUI (Python)
                 frame = [str(frame.dtype), base64.b64encode(frame).decode("utf-8"), frame.shape]
-            if for_network == True:
+            elif for_network == True:
                 stream = cStringIO.StringIO()               
                 frame = frame[:,:,::-1]
                 #frame = np.roll(frame, 1, axis=-1) # BGR to RGB
@@ -141,8 +116,8 @@ class Car4W:
                 frame = base64.b64encode(stream.getvalue()).decode("utf-8")
             
             state[name] = frame
-        #logger.debug("All Camera FPS: {}".format(min(fps)))
-        #logger.debug("Received State in {} seconds".format(time.time() - start_time))
+        logger.debug("All Camera Info [FPS, QSize]: {}".format(fps))
+        logger.debug("Received State in {} seconds".format(time.time() - start_time))
         return state # converted to pickle in State.py
 
     def forward(self):
