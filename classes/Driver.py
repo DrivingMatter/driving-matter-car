@@ -21,7 +21,6 @@ class Driver:
     def __init__(self, car, show_camera = False):
         self.show_camera = show_camera
         self.car = car
-        self.cv2_window_name = []
         self.sign_detection = None
         self.display_process = None
         self.parent_pipe, self.child_pipe = None, None
@@ -57,10 +56,8 @@ class Driver:
             camera_names = [key for key in datavector if key.startswith('camera')]
             for name in camera_names:
 
-                if name not in self.cv2_window_name:
-                    self.cv2_window_name.append(name)
-
                 frame = datavector[name]
+                
                 cv2.imshow(name, frame)
                 cv2.waitKey(1)  # CV2 Devil - Don't dare to remove
         
@@ -193,5 +190,4 @@ class Driver:
         return datavector, datavector_title
 
     def close(self):
-        for window_name in self.cv2_window_name:
-            cv2.destroyWindow(window_name)
+        cv2.destroyAllWindows()
