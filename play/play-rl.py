@@ -37,6 +37,8 @@ import h5py
 from tempfile import TemporaryFile
 outfile = TemporaryFile()
 
+ACTIONS  = ("forward", "stop")
+
 logger = logging.getLogger("play_rl.py")
 logger.debug("ACTIONS = " + str(ACTIONS))
 sign_detection= SignDetection()
@@ -117,18 +119,18 @@ class CarEnv:
             if action==0:
                 reward -=2
             else:
-                reward += 0.01
+                reward += 0.2
         elif action==0:
-            reward += 0.5
-##        elif action == 1:
-##            reward -= 0.1
+            reward += 0.01
+        elif action == 1:
+            reward -= 0.1
         done = None # To be implement using OpenCV
 
         info = None
 
         return state, reward, done, info
 
-EPISODES = 40
+EPISODES =  20
 
 class DQNAgent:
     def __init__(self, state_size, action_size, batch_size):

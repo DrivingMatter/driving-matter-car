@@ -1,3 +1,4 @@
+
 import sys
 from os import path
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
@@ -22,6 +23,7 @@ def execute_action(action):
 try:
     kb = KBHit()
     while True:
+        """    
         if kb.kbhit():
             c = kb.carkey()
             if c == 0: # w
@@ -34,11 +36,12 @@ try:
                 execute_action("forwardLeft")
             elif c == 4: # [SPACE]
                 execute_action("stop")
-
+        """
         state = car.get_state_vector()
         driver.display_camera(state)
         
-        sleep(0.05)
+        #sleep(0.2)
+        #execute_action("stop")
 finally:
     driver.close()
     car.close()

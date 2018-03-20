@@ -8,6 +8,8 @@ from classes.LoadCar import load_car
 from classes.KBhit import KBHit
 import logging
 from time import sleep, time
+from Queue import Queue
+from threading import Thread
 logger = logging.getLogger("play_dataset.py")
 
 print "ACTIONS = " + str(ACTIONS)
@@ -15,15 +17,32 @@ print "ACTIONS = " + str(ACTIONS)
 car, rps_ms, port = load_car("../config.json")
 driver = Driver(car, show_camera = True)
 dataset = Dataset()
+q = Queue()
+
+
+def save_dataset():
+    global q
+    while True:
+        state0, action, state1 = q.get() 
+        datavector, datavector_title = driver.process_dataset_vector(state0, action, state1)
+        dataset.save_data(datavector, datavector_title)
+
+        logging.debug("Dataset saved")
+        
+        print ("Running")
+
+t = Thread(target=save_dataset)
+t.daemon = True
+t.start()
 
 def execute_action(action):
+    global q
     print ("="*80)
     logger.debug(str(time()) + ": Action " + action)
     state0, action, state1 = driver.action_blocking(action)
     logger.debug(str(time()) + ": Action executed")
-    datavector, datavector_title = driver.process_dataset_vector(state0, action, state1)
-    dataset.save_data(datavector, datavector_title)
-    logger.debug(str(time()) + ": dataset saved")
+        
+    q.put((state0, action, state1))
 
 try:
     kb = KBHit()
@@ -40,7 +59,7 @@ try:
                 execute_action("forwardLeft")
             elif c == 4: # Space
                 execute_action("stop")
-    sleep(0.001)
+        sleep(0.1)
 finally:
     driver.close()
     car.close()
