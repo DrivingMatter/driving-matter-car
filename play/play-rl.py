@@ -117,7 +117,7 @@ class CarEnv:
         #print stop
         if detected[stop[0]]:
             if action==0:
-                reward -=2
+                reward -=1
             else:
                 reward += 0.2
         elif action==0:
@@ -196,10 +196,10 @@ class DQNAgent:
 ##        print (npzfile['arr_0'])
 
     def act(self, state):
-
-        if np.random.rand() <= self.epsilon:
-            logger.debug("Taking random")
-            return random.randrange(self.action_size)
+##
+##        if np.random.rand() <= self.epsilon:
+##            logger.debug("Taking random")
+##            return random.randrange(self.action_size)
         logger.debug("Predicting...")
         state = state.reshape(1, 1, state.shape[1], state.shape[2])
         act_values = self.model.predict(state)
@@ -257,7 +257,7 @@ if __name__ == "__main__":
     agent = DQNAgent(len(state), action_size, 16)
     logger.debug("DQNAgent setup done")
 
-    agent.load("../save/rl-model.dat")
+    agent.load("../save/rl-model_pre.dat")
 
     for e in range(EPISODES):
         #env.reset()
@@ -284,7 +284,7 @@ if __name__ == "__main__":
                 break
         #env.reset()
         agent.replay()
-        if e % 2 == 0:
-            agent.save("../save/rl-model.dat")
+##        if e % 2 == 0:
+##            agent.save("../save/rl-model.dat")
         
             

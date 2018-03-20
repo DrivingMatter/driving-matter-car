@@ -56,7 +56,7 @@ class SignDetection:
         #self.image=cv2.resize(self.image,(int(width/10),int(height/10)),interpolation=cv2.INTER_AREA)
         gray_image = cv2.cvtColor(self.image , cv2.COLOR_BGR2GRAY)
         
-        gray_image = self.image
+        #gray_image = self.image
         if type=='Traffic light':
             sign=classifier.detectMultiScale(
             gray_image,
