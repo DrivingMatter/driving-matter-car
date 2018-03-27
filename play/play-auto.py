@@ -18,15 +18,15 @@ logger.debug("ACTIONS = " + str(ACTIONS))
 
 logging.debug("Loading model")
 
-json_file = open('../models/model002F-22.json', 'r')
+json_file = open('../models/model001.best.h5', 'r')
 loaded_model_json = json_file.read()
 json_file.close()
 
 loaded_model = model_from_json(loaded_model_json)
-loaded_model.load_weights("../models/model002F-22.hdf5")
+loaded_model.load_weights("../models/weights001.best.h5")
 
 loaded_model.compile(loss='categorical_crossentropy',
-                  optimizer='adam',
+                  optimizer='adadelta',
                   metrics=['accuracy'])
 
 logging.debug("Model loaded")
