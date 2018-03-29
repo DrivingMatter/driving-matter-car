@@ -13,6 +13,7 @@ import io
 import numpy as np
 import time
 from multiprocessing import Process, Pipe
+from skimage import exposure
 
 def rgb2gray(rgb):
     return np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
@@ -25,6 +26,11 @@ class Driver:
         self.display_process = None
         self.parent_pipe, self.child_pipe = None, None
         
+
+    def __histogram_equalize(img):
+        img_cdf, bin_centers = exposure.cumulative_distribution(img)
+        return np.interp(img, bin_centers, img_cdf)
+
     def detect_sign(self, datavector):
         s1 = time.time()
         
@@ -69,72 +75,32 @@ class Driver:
             print ("Got state " + str(time.time()))
 
             #collisions = state['sensors']
-        
-            #frame = np.hstack([state['camera_l'], state['camera_c'], state['camera_r']])
-            
+
+            if self.show_camera:
+                self.display_camera(state)
+
             actions = {}              
             for name in ['camera_c']:#, 'camera_l', 'camera_r']:
                 frame = state[name]
                 frame = color.rgb2gray(frame)
-                #print ("Converted " + str(time.time()))
-                
-                if self.show_camera:
-                    cv2.imshow(name, frame)
-                    cv2.waitKey(1)
-                
-                #print ("Showing "  + str(time.time()))
                 frame = misc.imresize(frame, 20) # Input image is 160x120
-                #print ("Resized "  + str(time.time()))
-                
+                frame = self.__histogram_equalize(frame)
                 frame = frame.astype('float32')
-                #print ("done type " + str(time.time()))
-                frame /= 255
-                #print ("done dvision "  + str(time.time()))
+                #frame /= 255 # Not need because we are using histogram equalization
                 frame = frame.reshape(1, 1, frame.shape[0], frame.shape[1]) # CNN
-                #print frame.shape
-                #frame = frame.reshape(1, frame.shape[0] * frame.shape[1]) # MLP
-                #print frame.shape
-                #print ("preprocessing done"  + str(time.time()))
+ 
                 action = model.predict(frame) # we get a integer
                 action = np.argmax(action, axis=1)[0]
                 action = ACTIONS[action]    # convert integer to function name eg forward, forwardLeft...
-                
-
                 actions[name] = action
-                #logger.debug("Predicted Action: " + action + " " + name)
-
-            # print actions
-            # if actions['camera_l'] == actions['camera_r']:
-            #     action = actions['camera_l']
-            # else:
-            #     action = actions['camera_c'];
-
-            #print actions['camera_c']
-
-
-            #logger.debug("Collisions: " + collisions)        
-            """
-            can_take_action = True    
             
-            for name in collisions:
-                if collisions[name] == True and COLLISIONS[action] == name:
-                    can_take_action = False
-                    logger.debug("Collision detected" + " " + str(time()))
-                    break
-
-            logger.debug("can_take_action: " + str(can_take_action) + " " + str(time()))        
-            """
-
-            #if can_take_action:
-            
+            logger.debug("Predicted Action: " + actions)
             
             logger.debug("Taking action " + str(time.time()))
             self.car.take_action(actions['camera_c'])
             sleep(self.car.timeframe) # Wait for action to complete            
             self.car.stop()
-            logger.debug("Car Stopped " + str(time.time()))
-            
-            sleep(0.5) # Wait for action to complete
+            logger.debug("Car Stopped " + str(time.time()))            
             print ("="*80)
             
 
