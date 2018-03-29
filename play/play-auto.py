@@ -18,7 +18,7 @@ logger.debug("ACTIONS = " + str(ACTIONS))
 
 logging.debug("Loading model")
 
-json_file = open('../models/model002F-22.json', 'r')
+json_file = open('../models/model.best (2).json', 'r')
 loaded_model_json = json_file.read()
 json_file.close()
 

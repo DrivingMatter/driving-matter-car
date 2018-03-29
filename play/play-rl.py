@@ -68,7 +68,7 @@ class CarEnv:
         #frame = Image.open(frame).convert(mode='L')
         #frame = np.asarray(frame)
         frame = color.rgb2gray(frame)
-        frame = misc.imresize(frame, 10) # TODO: convert to grayscale
+        frame = misc.imresize(frame, 20) # TODO: convert to grayscale
         frame = frame.astype('float32')
         frame /= 255
         
@@ -117,11 +117,11 @@ class CarEnv:
         #print stop
         if detected[stop[0]]:
             if action==0:
-                reward -=1
+                reward -=2
             else:
-                reward += 0.2
+                reward -= 0.01
         elif action==0:
-            reward += 0.01
+            reward -= 0.001
         elif action == 1:
             reward -= 0.1
         done = None # To be implement using OpenCV
@@ -130,7 +130,7 @@ class CarEnv:
 
         return state, reward, done, info
 
-EPISODES =  20
+EPISODES =  50
 
 class DQNAgent:
     def __init__(self, state_size, action_size, batch_size):
@@ -257,7 +257,7 @@ if __name__ == "__main__":
     agent = DQNAgent(len(state), action_size, 16)
     logger.debug("DQNAgent setup done")
 
-    agent.load("../save/rl-model_pre.dat")
+    agent.load("../save/rl-model_2.dat")
 
     for e in range(EPISODES):
         #env.reset()
@@ -283,8 +283,8 @@ if __name__ == "__main__":
                         .format(e, EPISODES, time, agent.epsilon))
                 break
         #env.reset()
-        agent.replay()
+##        agent.replay()
 ##        if e % 2 == 0:
-##            agent.save("../save/rl-model.dat")
-        
+##            agent.save("../save/rl-model1.dat")
+##        
             

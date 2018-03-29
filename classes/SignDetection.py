@@ -54,7 +54,7 @@ class SignDetection:
         #self.image = cv2.pyrDown(self.image)
         
         #self.image=cv2.resize(self.image,(int(width/10),int(height/10)),interpolation=cv2.INTER_AREA)
-        gray_image = cv2.cvtColor(self.image , cv2.COLOR_BGR2GRAY)
+        gray_image = cv2.cvtColor(self.image , cv2.COLOR_RGB2GRAY)
         
         #gray_image = self.image
         if type=='Traffic light':
@@ -81,7 +81,7 @@ class SignDetection:
            # d=self.distance_to_camera(v, 15.5 - 10, 300)
             d=self.distance_to_camera_temp(v)
             cv2.putText(self.image, "%s %.1fcm" %(type, d), (x, y+h+15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,219,0), 1)
-            if d < 28.0:
+            if d < 43.0:
                 self.detected[type]=True
             if type=='Traffic light':
                 boundaries = [
