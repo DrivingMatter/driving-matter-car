@@ -39,7 +39,7 @@ try:
         
         """
         state = car.get_state_vector(True)
-        driver.display_camera(state)
+        driver.detect_sign(state)
         sleep(1)
         #execute_action("stop")
 finally:

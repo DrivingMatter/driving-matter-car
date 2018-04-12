@@ -14,7 +14,6 @@ import numpy as np
 import time
 from multiprocessing import Process, Pipe
 from skimage import exposure
-import random
 
 def rgb2gray(rgb):
     return np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
@@ -37,23 +36,17 @@ class Driver:
         
         if self.sign_detection is None:
             self.sign_detection = SignDetection()
-        camera_names = [key for key in datavector if key.startswith('camera')]
-        for name in camera_names:
 
-            frame = datavector[name]
-            frame,dete = self.sign_detection.detect(frame)
-            cv2.imshow(name, frame)
-            cv2.waitKey(1)  # CV2 Devil - Don't dare to remove
-##        name = 'camera_c'
-##        frame = datavector[name]
-##        width, height, channel = frame.shape
-##        #frame=cv2.resize(frame,(int(width),int(height/2)),interpolation=cv2.INTER_AREA)
-##        frame,dete = self.sign_detection.detect(frame)
-##        #frame=cv2.resize(frame,(int(width),int(height*2)),interpolation=cv2.INTER_AREA)
-##        print "{}".format(time.time()-s1)
-##        
-##        cv2.imshow(name, frame)
-##        cv2.waitKey(1)  # CV2 Devil - Don't dare to remove
+        name = 'camera_c'
+        frame = datavector[name]
+        width, height, channel = frame.shape
+        #frame=cv2.resize(frame,(int(width),int(height/2)),interpolation=cv2.INTER_AREA)
+        frame = sign_detection.detect(frame)
+        #frame=cv2.resize(frame,(int(width),int(height*2)),interpolation=cv2.INTER_AREA)
+        print "{}".format(time.time()-s1)
+        
+        cv2.imshow(name, frame)
+        cv2.waitKey(1)  # CV2 Devil - Don't dare to remove
     
     def display_camera(self, datavector):
         if self.display_process is None:
@@ -87,7 +80,7 @@ class Driver:
                 self.display_camera(state)
 
             actions = {}              
-            for name in ['camera_c']: #, 'camera_l', 'camera_r']:
+            for name in ['camera_c', 'camera_l', 'camera_r']:
                 frame = state[name]
                 frame = color.rgb2gray(frame)
                 frame = misc.imresize(frame, 20) # Input image is 160x120
@@ -101,28 +94,17 @@ class Driver:
                 action = ACTIONS[action]    # convert integer to function name eg forward, forwardLeft...
                 actions[name] = action
             
-            #action_all = (actions['camera_c'], actions['camera_l'], actions['camera_r'])
-            
-            #if action_all ==  ('forward', 'forwardLeft', 'forwardRight'):
-            #    action = 'forward'
-            #elif action_all ==  ('forwardLeft', 'forwardRight', 'forwardLeft'):
-            #    action = "forwardLeft"
-            #elif action_all ==  ('forwardLeft', 'forwardRight', 'forwardLeft'):
-            #    action = "forwardRight"
-            #else:
-            #    idx = random.randrange(0, 3)
-            #    action = action_all[idx]
-
-            action = actions['camera_c']
-            logger.debug("Action: " + action)
-            #logger.debug("Predicted Action: " + str(actions))
+            logger.debug("Predicted Action: " + str(actions))
             
             logger.debug("Taking action " + str(time.time()))
-            self.car.take_action(action)
+            
+self.car.take_action(actions['camera_c'])
             sleep(self.car.timeframe) # Wait for action to complete            
             self.car.stop()
             logger.debug("Car Stopped " + str(time.time()))            
+            #sleep(1)
             print ("="*80)
+            
 
     def action_nowait(self, action):
         if action not in ACTIONS:

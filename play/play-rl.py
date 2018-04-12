@@ -115,15 +115,34 @@ class CarEnv:
         stop = [key for key in detected if key.startswith('Stop')]
         #print detected[key]
         #print stop
-        if detected[stop[0]]:
-            if action==0:
-                reward -=2
-            else:
-                reward -= 0.01
+        
+     #stop sign rewards   
+##        if detected[stop[0]]:
+##            if action==0:
+##                reward -=2
+##            else:
+##                reward -= 0.01
+##        elif action==0:
+##            reward -= 0.001
+##        elif action == 1:
+##            reward -= 0.1
+        
+        
+        
+        if detected['Red Light']:
+          if action==0:
+            reward-=2
+          else:
+            reward += 0.01 
+        if detected['Green Light'] or detected['Yellow Light']:
+          if action==0:
+            reward+= 0.001
+          else:
+            reward -=0.5
         elif action==0:
-            reward -= 0.001
+          reward += 0.001
         elif action == 1:
-            reward -= 0.1
+          reward -= 0.5
         done = None # To be implement using OpenCV
 
         info = None
@@ -257,7 +276,8 @@ if __name__ == "__main__":
     agent = DQNAgent(len(state), action_size, 16)
     logger.debug("DQNAgent setup done")
 
-    agent.load("../save/rl-model_2.dat")
+   # agent.load("../save/stop/rl-model_2_pre.dat")  #stop
+    agent.load("../save/rl-model-traffic-v3.dat")
 
     for e in range(EPISODES):
         #env.reset()
@@ -266,7 +286,7 @@ if __name__ == "__main__":
         for time in range(10):
 
             action = agent.act(state)
-
+            print action
             next_state, reward, done, _ = env.step(action)
             print reward 
 
@@ -285,6 +305,6 @@ if __name__ == "__main__":
         #env.reset()
 ##        agent.replay()
 ##        if e % 2 == 0:
-##            agent.save("../save/rl-model1.dat")
-##        
+##            agent.save("../save/rl-model_2.dat")
+        
             

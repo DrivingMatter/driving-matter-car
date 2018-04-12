@@ -18,7 +18,7 @@ logger.debug("ACTIONS = " + str(ACTIONS))
 
 logging.debug("Loading model")
 
-json_file = open('../models/model001.best.h5', 'r')
+json_file = open('../models/model001.best.json', 'r')
 
 loaded_model_json = json_file.read()
 json_file.close()
@@ -32,7 +32,7 @@ loaded_model.compile(loss='categorical_crossentropy',
 
 logging.debug("Model loaded")
 
-car, rps_ms, port = load_car("../config-auto.json")
+car, rps_ms, port = load_car("../config-auto2.json")
 
 driver = Driver(car, show_camera = True)
 

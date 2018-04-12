@@ -8,6 +8,7 @@ from datetime import datetime
 from PIL import Image
 import io
 from scipy import misc
+import cv2
 logger = logging.getLogger(__name__)
 
 class Dataset:
@@ -47,7 +48,8 @@ class Dataset:
                 #value = Image.open(io.BytesIO(value))
                 path = self.images_path + name
                 rel_path = self.images_rel_path + name
-                misc.imsave(path, frame)
+                #misc.imsave(path, frame)
+                cv2.imwrite(path, frame)
                 #value.save(path)
                 datavector[key] = rel_path
                 
